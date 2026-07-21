@@ -1,0 +1,99 @@
+reconstruction:
+  AlgorithmName: DMAS
+  envelope_signal: false
+  remove_negatives: true
+  bandpass_filter: false
+  frequency_low: 0.1e6
+  frequency_high: 10.0e6
+  SaveOutput: false
+  SaveMat: true
+  SavePng: true
+  OutputDir: output/recon
+  OutputSuffix: ""
+  iterative:
+    interp_method: linear
+    InitialGuess: DMAS
+    NumIterations: 5
+    StepSize: 0.25
+    UpdateMethod: TR
+
+simulation:
+  UseSimulation: true
+  SensorDataPath: ""
+  ImagePath: data/example.bmp
+  SensorType: linear
+  NoiseLevel: 0.1
+  GridSize: 512
+  MinFrequency: 0
+  MaxFrequency: 5.0e6
+  SoundSpeed: 1500
+  Density: 1000
+  NumTransducers: 128
+  Pitch: 3.0e-4
+  Kerf: 3.0e-5
+
+benchmark_algorithms:
+  IncludeIterative: true
+  envelope_signal: true
+  remove_negatives: true
+  bandpass_filter: false
+  frequency_low: 0.1e6
+  frequency_high: 10.0e6
+  Algorithms:
+    - DAS
+    - CF-DAS
+    - DMAS
+    - DS-DMAS
+    - MV-DAS
+    - VDAS
+    - SCF-DAS
+    - CFMV-DAS
+    - FBP
+    - UBP
+    - DMAS-UBP
+    - VDAS-UBP
+    - TR
+    - "ITERATIVE-DAS"
+    - "ITERATIVE-TR"
+  Metrics:
+    - CompTime
+    - RMSE
+    - PSNR
+    - SSIM
+    - SNR
+    - Sharpness
+    - UIQI
+    - CNR
+    - SBR
+  OutputPath: output/benchmark/algorithm_benchmark_table_envelope.png
+  SaveCsv: true
+  CsvPath: output/benchmark/algorithm_benchmark_table_envelope.csv
+
+multi_reconstruction:
+  IncludeIterative: true
+  envelope_signal: false
+  remove_negatives: true
+  bandpass_filter: false
+  frequency_low: 0.1e6
+  frequency_high: 10.0e6
+  Algorithms:
+    - DAS
+    - CF-DAS
+    - DMAS
+    - DS-DMAS
+    - MV-DAS
+    - VDAS
+    - SCF-DAS
+    - CFMV-DAS
+    - FBP
+    - UBP
+    - DMAS-UBP
+    - VDAS-UBP
+    - TR
+    - "ITERATIVE-DAS"
+    - "ITERATIVE-TR"
+  OutputDir: output/recon
+  OutputSuffix: ""
+  SaveFigure: true
+  SaveMat: true
+  SavePng: false
