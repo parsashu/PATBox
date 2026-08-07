@@ -23,7 +23,10 @@ install_patbox();
 algorithm = reconParameters('AlgorithmName');
 sim_cfg = simParameters();
 
-img_path = fullfile(patbox_root, 'data', 'example.bmp');
+img_path = fullfile(patbox_root, 'data', 'Example1.bmp');
+if ~exist(img_path, 'file')
+    img_path = fullfile(patbox_root, 'data', 'example.bmp');
+end
 if ~exist(img_path, 'file')
     img_path = fullfile(fileparts(patbox_root), 'simulation', '3.bmp');
 end
@@ -32,7 +35,7 @@ if ~exist(img_path, 'file')
 end
 if ~exist(img_path, 'file')
     error(['No example image found. Place a vessel BMP at:\n  %s\n' ...
-           'or set img_path in this script.'], fullfile(patbox_root, 'data', 'example.bmp'));
+           'or set img_path in this script.'], fullfile(patbox_root, 'data', 'Example1.bmp'));
 end
 
 fprintf('Simulating with %s sensor array...\n', sim_cfg.SensorType);

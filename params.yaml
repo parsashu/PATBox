@@ -20,7 +20,7 @@ reconstruction:
 simulation:
   UseSimulation: true
   SensorDataPath: ""
-  ImagePath: data/example.bmp
+  ImagePath: data/Example1.bmp
   RandomSeed: 1
 
   # Numerical grid and solver

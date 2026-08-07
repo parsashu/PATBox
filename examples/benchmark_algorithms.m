@@ -25,7 +25,10 @@ sim_cfg = simParameters();
 algorithms = benchmark_cfg.Algorithms;
 metric_names = benchmark_cfg.Metrics;
 
-img_path = fullfile(patbox_root, 'data', 'example.bmp');
+img_path = fullfile(patbox_root, 'data', 'Example1.bmp');
+if ~exist(img_path, 'file')
+    img_path = fullfile(patbox_root, 'data', 'example.bmp');
+end
 if ~exist(img_path, 'file')
     img_path = fullfile(fileparts(patbox_root), 'simulation', '3.bmp');
 end

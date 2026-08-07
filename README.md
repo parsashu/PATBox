@@ -63,7 +63,7 @@ reconstruction:
 simulation:
   UseSimulation: true          # false = load SensorDataPath instead of k-Wave
   SensorDataPath: ""            # .mat with sim struct or legacy sensor fields
-  ImagePath: data/example.bmp
+  ImagePath: data/Example1.bmp
   SensorType: linear            # linear | square | circular | arc
   NoiseModel: awgn
   TargetSNRdB: 20               # preferred noise control (NoiseLevel is deprecated)
@@ -115,7 +115,7 @@ simulation:
 ```matlab
 install_patbox('/path/to/k-Wave')
 
-[p0_recon, sim, info, metrics] = patReconImage('data/example.bmp', 'Algorithm', 'DMAS');
+[p0_recon, sim, info, metrics] = patReconImage('data/Example1.bmp', 'Algorithm', 'DMAS');
 
 fprintf('Algorithm: %s | PSNR: %.2f dB | SSIM: %.3f\n', ...
     info.algorithm, metrics.psnr, metrics.ssim);
@@ -124,13 +124,13 @@ fprintf('Algorithm: %s | PSNR: %.2f dB | SSIM: %.3f\n', ...
 With simulation options:
 
 ```matlab
-[p0_recon, sim, info, metrics] = patReconImage('data/example.bmp', ...
+[p0_recon, sim, info, metrics] = patReconImage('data/Example1.bmp', ...
     'SensorType', 'linear', ...
     'TargetSNRdB', 20, ...
     'Algorithm', 'DS-DMAS');
 ```
 
-Relative paths like `'data/example.bmp'` are resolved from the PATBox folder.
+Relative paths like `'data/Example1.bmp'` are resolved from the PATBox folder.
 
 ---
 
@@ -139,7 +139,7 @@ Relative paths like `'data/example.bmp'` are resolved from the PATBox folder.
 ```matlab
 install_patbox()
 
-img_path = fullfile(fileparts(which('patSimulate')), 'data', 'example.bmp');
+img_path = fullfile(fileparts(which('patSimulate')), 'data', 'Example1.bmp');
 sim = patSimulate(img_path, 'SensorType', 'linear', 'TargetSNRdB', 20);
 
 [p0_recon, info] = patReconstruct(sim, 'DS-DMAS');
