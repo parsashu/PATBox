@@ -1,17 +1,12 @@
 % =========================================================================
 % Project: Robust Multi-Wavelength Photoacoustic Imaging in Optically Heterogeneous Tissue
-% 
+%
 % Component: High-Level Unified Simulation & Reconstruction API Dispatcher
 % Authors:   Parsa Shahidi
 % Date:      June 2026
 %
 % Description:
-%   This function serves as the high-level entry-point API for PATBox. It 
-%   features an automated parameter-splitting architecture that dispatches 
-%   variable Name-Value pairs into separate simulation and reconstruction 
-%   pipelines, dynamically switches between live forward modeling and pre-
-%   computed dataset loading, and encapsulates the subsequent image 
-%   reconstruction and quality metric evaluation.
+%   High-level PATBox entry point: simulate (or load), reconstruct, and evaluate.
 % =========================================================================
 
 function [p0_recon, sim, info, metrics] = patReconImage(img_path, varargin)
@@ -20,68 +15,87 @@ function [p0_recon, sim, info, metrics] = patReconImage(img_path, varargin)
 %   [p0_recon, sim, info, metrics] = patReconImage()
 %   [p0_recon, sim, info, metrics] = patReconImage(img_path)
 %   [p0_recon, sim, info, metrics] = patReconImage(img_path, ...
-%       'SensorType', 'linear', 'NoiseLevel', 0.1, 'Algorithm', 'DMAS')
+%       'SensorType', 'linear', 'TargetSNRdB', 20, 'Algorithm', 'DMAS')
 %
-%   Simulation options: UseSimulation, SensorDataPath, ImagePath, SensorType,
-%   NoiseLevel, GridSize, MinFrequency, MaxFrequency, SoundSpeed, Density,
-%   NumTransducers, Pitch, Kerf
-%   Reconstruction options: Algorithm, remove_negatives, NumIterations, ...
+% Simulation name-value pairs may be any field from simParameters() /
+% params.yaml simulation section (for example SensorType, TargetSNRdB,
+% NoiseModel, GridSize, MediumModel). Reconstruction options pass through to
+% patReconstruct.
 
-    sim_param_names = {
-        'UseSimulation'
-        'SensorDataPath'
-        'ImagePath'
-        'SensorType'
-        'NoiseLevel'
-        'GridSize'
-        'MinFrequency'
-        'MaxFrequency'
-        'SoundSpeed'
-        'Density'
-        'NumTransducers'
-        'Pitch'
-        'Kerf'
-    };
-    [sim_args, recon_args] = splitNameValueArgs(varargin, sim_param_names);
+    if nargin < 1
+        img_path = '';
+    elseif ~(ischar(img_path) || isstring(img_path) || isempty(img_path))
+        varargin = [{img_path}, varargin];
+        img_path = '';
+    elseif isSimulationParameterName(img_path) || isReconParameterNameLocal(img_path)
+        varargin = [{img_path}, varargin];
+        img_path = '';
+    end
 
+    [sim_args, recon_args] = splitNameValueArgs(varargin);
     sim_cfg = applySimOverridesFromArgs(simParameters(), sim_args);
-    if ~sim_cfg.UseSimulation
+
+    if ~logical(sim_cfg.UseSimulation)
         sim = loadSimulation(resolvePatboxPath(sim_cfg.SensorDataPath));
     else
-        if nargin < 1 || isempty(img_path)
+        if isempty(img_path)
             img_path = sim_cfg.ImagePath;
         end
         sim = patSimulate(img_path, sim_args{:});
     end
 
     [p0_recon, info] = patReconstruct(sim, recon_args{:});
-    metrics = patEvaluate(p0_recon, sim.source.p0);
+    if isfield(sim, 'p0_reference')
+        truth = sim.p0_reference;
+    else
+        truth = sim.source.p0;
+    end
+    metrics = patEvaluate(p0_recon, truth);
 end
 
 function cfg = applySimOverridesFromArgs(cfg, args)
-    i = 1;
-    while i <= numel(args)
+    for i = 1:2:numel(args)
         key = matlab.lang.makeValidName(char(args{i}));
         cfg.(key) = args{i + 1};
-        i = i + 2;
     end
 end
 
-function [matched, remaining] = splitNameValueArgs(args, names)
-    matched = {};
-    remaining = {};
-    i = 1;
-    while i <= numel(args)
-        name = args{i};
-        if (ischar(name) || isstring(name)) && any(strcmpi(char(name), names))
-            if i == numel(args)
-                error('PATBox:MissingValue', 'Missing value for parameter %s.', char(name));
-            end
-            matched(end + 1:end + 2) = {char(name), args{i + 1}}; %#ok<AGROW>
-            i = i + 2;
+function [simArgs, reconArgs] = splitNameValueArgs(args)
+    simArgs = {};
+    reconArgs = {};
+    if mod(numel(args), 2) ~= 0
+        if ~isempty(args) && (ischar(args{1}) || isstring(args{1})) && ...
+                ~isSimulationParameterName(args{1}) && ~isReconParameterNameLocal(args{1})
+            reconArgs = args(1);
+            args = args(2:end);
         else
-            remaining(end + 1:end + numel(args) - i + 1) = args(i:end); %#ok<AGROW>
-            break;
+            error('PATBox:InvalidNameValuePairs', 'Expected complete name-value pairs.');
         end
     end
+
+    for i = 1:2:numel(args)
+        name = args{i};
+        if ~(ischar(name) || isstring(name))
+            error('PATBox:InvalidParameterName', ...
+                'Parameter names must be character vectors or strings.');
+        end
+        if isSimulationParameterName(name)
+            simArgs(end + 1:end + 2) = {char(name), args{i + 1}}; %#ok<AGROW>
+        elseif isReconParameterNameLocal(name)
+            reconArgs(end + 1:end + 2) = {char(name), args{i + 1}}; %#ok<AGROW>
+        else
+            error('PATBox:UnknownParameter', 'Unknown PATBox parameter: %s', char(name));
+        end
+    end
+end
+
+function tf = isSimulationParameterName(name)
+    names = fieldnames(simParameters());
+    tf = any(strcmpi(char(name), names));
+end
+
+function tf = isReconParameterNameLocal(name)
+    paramList = reconParameters();
+    names = [{'Algorithm'}; paramList(:, 1)];
+    tf = any(strcmpi(char(name), names));
 end

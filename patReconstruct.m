@@ -33,7 +33,11 @@ function [p0_recon, info] = patReconstruct(varargin)
     if isSimStruct(varargin{1})
         sim = varargin{1};
         sensor_data = sim.sensor_data;
-        sensor_geometry = sim.sensor;
+        if isfield(sim, 'sensor_geometry')
+            sensor_geometry = sim.sensor_geometry;
+        else
+            sensor_geometry = sim.sensor;
+        end
         kgrid = sim.kgrid;
         sound_speed = sim.sound_speed;
         recon_varargin = varargin(2:end);
@@ -51,6 +55,9 @@ function [p0_recon, info] = patReconstruct(varargin)
         error('PATBox:InvalidInput', ...
             'Provide a simulation struct or sensor_data, sensor, kgrid, and sound_speed.');
     end
+
+    [sensor_data, sensor_geometry] = legacyCompatibleSensorInputs( ...
+        sensor_data, sensor_geometry, kgrid);
 
     algorithm = reconParameters('AlgorithmName');
     algorithm_explicit = false;
@@ -107,7 +114,9 @@ end
 
 function ground_truth = getGroundTruth(sim)
     ground_truth = [];
-    if isfield(sim, 'source') && isstruct(sim.source) && isfield(sim.source, 'p0')
+    if isfield(sim, 'p0_reference') && ~isempty(sim.p0_reference)
+        ground_truth = sim.p0_reference;
+    elseif isfield(sim, 'source') && isstruct(sim.source) && isfield(sim.source, 'p0')
         ground_truth = sim.source.p0;
     end
 end

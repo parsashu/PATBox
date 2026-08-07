@@ -40,8 +40,8 @@ fprintf('============================================================\n');
 fprintf('   Test Reconstruction Algorithms with %s Sensor\n', sensor_type_display);
 fprintf('============================================================\n\n');
 
-fprintf('Running forward simulation (%s sensor, %.0f%% noise)...\n', ...
-    sim_cfg.SensorType, sim_cfg.NoiseLevel * 100);
+fprintf('Running forward simulation (%s sensor, TargetSNRdB=%.1f)...\n', ...
+    sim_cfg.SensorType, sim_cfg.TargetSNRdB);
 [sensor_data, sensor, kgrid, source, noisy_p0, sound_speed] = patSimulate(img_path);
 
 p0_ground_truth = source.p0;
@@ -84,9 +84,10 @@ for i = 1:numel(algorithms)
         p0_recon_normalized = mat2gray(gather(p0_recon));
         sensor_type = sim_cfg.SensorType;
         noise_level = sim_cfg.NoiseLevel;
+        target_snr_db = sim_cfg.TargetSNRdB;
         recon_time = info.elapsed_seconds;
         save(mat_path, 'p0_recon', 'p0_recon_normalized', 'source', 'kgrid', ...
-            'algo_name', 'sensor_type', 'noise_level', 'recon_time', ...
+            'algo_name', 'sensor_type', 'noise_level', 'target_snr_db', 'recon_time', ...
             'metrics', 'info', 'sim_cfg', 'multi_cfg');
         fprintf('Saved reconstruction to: %s\n', mat_path);
     end
@@ -119,7 +120,7 @@ function saveReconComparisonFigure(fig_path, kgrid, p0_gt, noisy_p0, p0_recon, .
 
     subplot(1, 4, 2);
     imagesc(kgrid.y_vec * 1e3, kgrid.x_vec * 1e3, noisy_p0_norm);
-    title(sprintf('Noisy Initial Pressure (%.0f%%)', sim_cfg.NoiseLevel * 100), 'FontSize', 10);
+    title(sprintf('Reference p_0 (SNR target %.1f dB)', sim_cfg.TargetSNRdB), 'FontSize', 10);
     axis image; xlabel('y [mm]'); ylabel('x [mm]'); colorbar;
 
     subplot(1, 4, 3);
@@ -133,8 +134,8 @@ function saveReconComparisonFigure(fig_path, kgrid, p0_gt, noisy_p0, p0_recon, .
     title('Difference (True - Recon)', 'FontSize', 12);
     axis image; xlabel('y [mm]'); ylabel('x [mm]'); colorbar; colormap(gca, 'jet');
 
-    sgtitle(sprintf('%s Reconstruction with %s Array (%.0f%% Noise)', ...
-        algo_name, sensor_type_display, sim_cfg.NoiseLevel * 100), ...
+    sgtitle(sprintf('%s Reconstruction with %s Array (TargetSNRdB=%.1f)', ...
+        algo_name, sensor_type_display, sim_cfg.TargetSNRdB), ...
         'FontSize', 10, 'FontWeight', 'bold');
 
     output_dir = fileparts(fig_path);

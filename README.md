@@ -62,12 +62,12 @@ reconstruction:
 
 simulation:
   UseSimulation: true          # false = load SensorDataPath instead of k-Wave
-  SensorDataPath: ""            # .mat with sensor_data, sensor, kgrid, source, sound_speed
+  SensorDataPath: ""            # .mat with sim struct or legacy sensor fields
   ImagePath: data/example.bmp
-  SensorType: linear            # linear | square | circular
-  NoiseLevel: 0.1
+  SensorType: linear            # linear | square | circular | arc
+  NoiseModel: awgn
+  TargetSNRdB: 20               # preferred noise control (NoiseLevel is deprecated)
   GridSize: 512
-  MinFrequency: 0
   MaxFrequency: 5.0e6
   SoundSpeed: 1500
   Density: 1000
@@ -126,7 +126,7 @@ With simulation options:
 ```matlab
 [p0_recon, sim, info, metrics] = patReconImage('data/example.bmp', ...
     'SensorType', 'linear', ...
-    'NoiseLevel', 0.1, ...
+    'TargetSNRdB', 20, ...
     'Algorithm', 'DS-DMAS');
 ```
 
@@ -140,7 +140,7 @@ Relative paths like `'data/example.bmp'` are resolved from the PATBox folder.
 install_patbox()
 
 img_path = fullfile(fileparts(which('patSimulate')), 'data', 'example.bmp');
-sim = patSimulate(img_path, 'SensorType', 'linear', 'NoiseLevel', 0.1);
+sim = patSimulate(img_path, 'SensorType', 'linear', 'TargetSNRdB', 20);
 
 [p0_recon, info] = patReconstruct(sim, 'DS-DMAS');
 metrics = patEvaluate(p0_recon, sim.source.p0);
@@ -154,7 +154,7 @@ fprintf('PSNR: %.2f dB\n', metrics.psnr);
 | Function | Role |
 |----------|------|
 | `install_patbox` | Add PATBox to the path; configure/load k-Wave |
-| `patSimulate` | Forward simulation (`SensorType`: linear, square, circular) |
+| `patSimulate` | Physics-aware forward simulation (`SensorType`: linear, square, circular, arc) |
 | `patReconstruct` | Unified reconstruction entry point (accepts sim struct or raw inputs) |
 | `patReconImage` | Simulate + reconstruct + evaluate in one call |
 | `patListAlgorithms` | List supported algorithm names |
@@ -174,14 +174,17 @@ Algorithm-specific options (`remove_negatives`, `NumIterations`, etc.) pass thro
 ```
 PATBox/
   install_patbox.m           % path setup + k-Wave config
-  patSimulate.m              % forward sim API
+  patSimulate.m              % forward sim API (physical core)
   patReconstruct.m           % main recon API
   patReconImage.m            % simulate + reconstruct + evaluate
   patEvaluate.m              % image quality metrics
   params.yaml                % default reconstruction + simulation parameters
   recon/                     % reconstruction .m files
-  simulation/                % k-Wave forward sim .m files
-  utils/                     % getReconFunction.m, reconParameters.m, simParameters.m, benchmarkParameters.m, ...
+  simulation/                % forward_simulation_physical + legacy wrappers
+  physics/                   % medium + initial-pressure builders
+  geometry/                  % physical sensor geometry
+  noise/                     % acquisition / noise model
+  utils/                     % helpers (simParameters, loadSimulation, ...)
   examples/
   data/
 ```

@@ -21,16 +21,112 @@ simulation:
   UseSimulation: true
   SensorDataPath: ""
   ImagePath: data/example.bmp
-  SensorType: linear
-  NoiseLevel: 0.1
+  RandomSeed: 1
+
+  # Numerical grid and solver
   GridSize: 512
+  GridSizeX: 512
+  GridSizeY: 520
+  Dx: 0
+  Dy: 0
+  PointsPerWavelength: 4
+  CFL: 0.2
+  SimulationEndTime: 0
+  PMLSize: 20
+  DataCast: gpuArray-single
+  PlotSimulation: false
+  SmoothInitialPressure: true
   MinFrequency: 0
   MaxFrequency: 5.0e6
+
+  # Initial pressure
+  SourceModel: normalized_image        # normalized_image | initial_pressure_mat | absorption_fluence
+  SourceMapPath: ""
+  InitialPressureVariable: p0
+  AbsorptionVariable: mu_a
+  FluenceVariable: fluence
+  Gruneisen: 0.12
+  SourceScale: 1
+  P0Scale: 2
+  AllowNegativeInitialPressure: false
+
+  # Acoustic medium: homogeneous | gaussian | mat | segmented
+  MediumModel: homogeneous
+  MediumMapPath: ""
   SoundSpeed: 1500
   Density: 1000
+  SoundSpeedStd: 20
+  DensityStd: 15
+  CorrelationLength: 1.0e-3
+  AlphaCoeff: 0
+  AlphaPower: 1.5
+  AlphaMode: full
+  BonA: 0
+  CouplingLayerThickness: 0
+  CouplingLayerSide: xmin
+  CouplingSoundSpeed: 1480
+  CouplingDensity: 1000
+  CouplingAlphaCoeff: 0
+  CouplingBonA: 0
+
+  # Physical array
+  SensorType: linear                   # linear | square | circular | arc
+  SensorModel: auto                    # auto | kwave_array | rasterized | point | cartesian_point
   NumTransducers: 128
   Pitch: 3.0e-4
   Kerf: 3.0e-5
+  ElementWidth: 2.7e-4
+  ElementIntegrationPoints: 0
+  SensorMargin: 0
+  SensorRadius: 0
+  SensorArcDeg: 180
+  SensorStartAngleDeg: -90
+  SensorRotationDeg: 0
+  ArrayCenterX: 0
+  ArrayCenterY: 0
+  SensorPositionStd: 0
+  SensorRadialPositionStd: 0
+  SensorAngularPositionStdDeg: 0
+  SensorAngleStdDeg: 0
+  ReconstructionGeometryMode: calibrated
+  RequireSourceInsideClosedAperture: true
+  SourceSupportThreshold: 1.0e-3
+  UseDirectivity: true
+  DirectivityPattern: pressure
+  CenterFrequency: 5.0e6
+  FractionalBandwidthPercent: 80
+  ImpulseResponsePath: ""
+  ImpulseResponseVariable: ""
+
+  # Acquisition / noise model
+  NoiseModel: awgn                     # none | awgn | colored | measured | hybrid
+  NoiseLevel: 0.1                      # deprecated; prefer TargetSNRdB
+  TargetSNRdB: 20
+  NoiseCalibrationMode: target_snr
+  NoiseScale: 1
+  NoiseScaling: global
+  NoiseDataPath: ""
+  MeasuredNoiseVariable: ""
+  MeasuredNoiseSampleRate: 0
+  MeasuredNoiseStartSample: 0
+  MeasuredNoiseDetrend: constant
+  MeasuredNoiseAllowTiling: false
+  NoiseColorBeta: 1
+  MeasuredNoiseFraction: 0.7
+  BaselineDriftLevel: 0
+  ImpulseNoiseProbability: 0
+  ImpulseNoiseScale: 10
+  LaserEnergyStd: 0
+  ChannelGainStd: 0
+  TimeJitterStd: 0
+  TriggerJitterStd: 0
+  CrosstalkFraction: 0
+  CrosstalkWrap: false
+  DeadChannelFraction: 0
+  InterferenceFrequenciesHz: []
+  InterferenceRelativeAmplitudes: []
+  ADCBitDepth: 0
+  SaturationLevel: 0
 
 benchmark_algorithms:
   IncludeIterative: true
