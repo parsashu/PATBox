@@ -164,7 +164,6 @@ benchmark_algorithms:
   OutputPath: output/benchmark/algorithm_benchmark_table_envelope.png
   SaveCsv: true
   CsvPath: output/benchmark/algorithm_benchmark_table_envelope.csv
-
 multi_reconstruction:
   IncludeIterative: true
   envelope_signal: false
