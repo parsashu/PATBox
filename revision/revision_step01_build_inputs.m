@@ -73,26 +73,17 @@ mediumCfg = struct();
 mediumCfg.randomSeed = 31;
 
 mediumCfg.c0 = 1500;
-
-mediumCfg.soundSpeedBounds = ...
-    [1450 1550];
-
-mediumCfg.heterogeneityMaxDelta = 35;
-
-mediumCfg.nInclusionsRange = ...
-    [2 5];
+mediumCfg.soundSpeedStd = 20;
+mediumCfg.soundSpeedBounds = [1420 1580];
 
 mediumCfg.rho0 = 1000;
+mediumCfg.densityStd = 15;
+mediumCfg.densityBounds = [940 1060];
 
-mediumCfg.densityFractionStd = ...
-    0.02;
-
-% IMPORTANT for controlled sensitivity study
-mediumCfg.randomizeBaselineSoundSpeed = false;
+mediumCfg.nInclusionsRange = [3 6];
 
 [medium, mediumMeta] = ...
-    makeRandomForwardMedium( ...
-    kgrid, mediumCfg);
+    makeRandomForwardMedium(kgrid,mediumCfg);
 
 sound_speed = medium.sound_speed;
 density     = medium.density;
@@ -208,3 +199,6 @@ fprintf('  rho std      = %.3f kg/m^3\n', ...
 
 fprintf('\nFiles written to:\n%s\n', ...
     outputDir);
+
+fprintf('  corr(c,rho)   = %.4f\n', ...
+    mediumMeta.soundDensityCorrelation);
