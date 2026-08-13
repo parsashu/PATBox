@@ -25,425 +25,530 @@ function [recons, info] = publicationBeamformers(sim, varargin)
 % beamformer implementations so that manuscript equations and code
 % remain exactly aligned.
 
-    %% =========================================================
-    % OPTIONS
-    % ==========================================================
+%% =========================================================
+% OPTIONS
+% ==========================================================
 
-    p = inputParser;
+p = inputParser;
 
-    addParameter(p, ...
-        'SoundSpeed', ...
-        1500, ...
-        @(x) isnumeric(x) && isscalar(x) && x > 0);
+addParameter(p, ...
+    'SoundSpeed', ...
+    1500, ...
+    @(x) isnumeric(x) && isscalar(x) && x > 0);
 
-    addParameter(p, ...
-        'Interpolation', ...
-        'linear', ...
-        @(x) ischar(x) || isstring(x));
+addParameter(p, ...
+    'Interpolation', ...
+    'linear', ...
+    @(x) ischar(x) || isstring(x));
 
-    addParameter(p, ...
-        'CFPower', ...
-        1.0, ...
-        @(x) isnumeric(x) && isscalar(x) && x > 0);
+addParameter(p, ...
+    'CFPower', ...
+    1.0, ...
+    @(x) isnumeric(x) && isscalar(x) && x > 0);
 
-    addParameter(p, ...
-        'SCFPower', ...
-        1.5, ...
-        @(x) isnumeric(x) && isscalar(x) && x > 0);
+addParameter(p, ...
+    'SCFPower', ...
+    1.5, ...
+    @(x) isnumeric(x) && isscalar(x) && x > 0);
 
-    parse(p,varargin{:});
+parse(p,varargin{:});
 
-    cRef = double(p.Results.SoundSpeed);
-    interpMethod = char(p.Results.Interpolation);
+cRef = double(p.Results.SoundSpeed);
+interpMethod = char(p.Results.Interpolation);
 
-    pCF = double(p.Results.CFPower);
-    pSCF = double(p.Results.SCFPower);
+pCF = double(p.Results.CFPower);
+pSCF = double(p.Results.SCFPower);
 
-    %% =========================================================
-    % INPUT VALIDATION
-    % ==========================================================
+%% =========================================================
+% INPUT VALIDATION
+% ==========================================================
 
-    assert(isfield(sim,'sensor_data'), ...
-        'sim.sensor_data missing.');
+assert(isfield(sim,'sensor_data'), ...
+    'sim.sensor_data missing.');
 
-    assert(isfield(sim.sensor_data,'p'), ...
-        'sim.sensor_data.p missing.');
+assert(isfield(sim.sensor_data,'p'), ...
+    'sim.sensor_data.p missing.');
 
-    assert(isfield(sim,'sensor_geometry'), ...
-        'sim.sensor_geometry missing.');
+assert(isfield(sim,'sensor_geometry'), ...
+    'sim.sensor_geometry missing.');
 
-    assert(isfield(sim.sensor_geometry,'positions'), ...
-        'Physical receiver positions missing.');
+assert(isfield(sim.sensor_geometry,'positions'), ...
+    'Physical receiver positions missing.');
 
-    assert(isfield(sim,'kgrid'), ...
-        'sim.kgrid missing.');
+assert(isfield(sim,'kgrid'), ...
+    'sim.kgrid missing.');
 
-    %% =========================================================
-    % RF
-    % ==========================================================
+%% =========================================================
+% RF
+% ==========================================================
 
-    rf = sim.sensor_data.p;
+rf = sim.sensor_data.p;
 
-    if isa(rf,'gpuArray')
-        rf = gather(rf);
-    end
+if isa(rf,'gpuArray')
+    rf = gather(rf);
+end
 
-    rf = double(rf);
+rf = double(rf);
 
-    receiverPositions = ...
-        double(sim.sensor_geometry.positions);
+receiverPositions = ...
+    double(sim.sensor_geometry.positions);
 
-    nSensors = size(receiverPositions,1);
+nSensors = size(receiverPositions,1);
 
-    Nt = sim.kgrid.Nt;
-    dt = double(sim.kgrid.dt);
+%% =========================================================
+% CANONICAL RECEIVER ORDERING
+%
+% Circular / arc arrays are ordered by increasing polar angle.
+% RF rows are reordered identically.
+%
+% This is essential for reproducible triangular DS-DMAS.
+% ==========================================================
 
-    assert(size(rf,1)==nSensors, ...
-        'RF channels do not match receiver count.');
+arrayCenter = mean(receiverPositions,1);
 
-    assert(size(rf,2)==Nt, ...
-        'RF temporal dimension does not match kgrid.Nt.');
+relativePos = ...
+    receiverPositions - arrayCenter;
 
-    %% =========================================================
-    % GRID
-    % ==========================================================
+polarAngle = mod( ...
+    atan2( ...
+    relativePos(:,2), ...
+    relativePos(:,1)), ...
+    2*pi);
 
-    Nx = sim.kgrid.Nx;
-    Ny = sim.kgrid.Ny;
+[polarAngleSorted,canonicalOrder] = ...
+    sort(polarAngle,'ascend');
 
-    xVec = double(sim.kgrid.x_vec(:));
-    yVec = double(sim.kgrid.y_vec(:));
+receiverPositionsOriginal = ...
+    receiverPositions;
 
-    [X,Y] = ndgrid(xVec,yVec);
+rfOriginal = rf;
 
-    tArray = (0:Nt-1)*dt;
+receiverPositions = ...
+    receiverPositions(canonicalOrder,:);
 
-    %% =========================================================
-    % SHARED DELAYED CHANNEL TENSOR
-    %
-    % delayed(:,:,m) = x_m(r)
-    % ==========================================================
+rf = ...
+    rf(canonicalOrder,:);
 
-    fprintf('\n');
-    fprintf('=============================================\n');
-    fprintf('PUBLICATION BEAMFORMING ENGINE\n');
-    fprintf('=============================================\n');
+% Audit angular ordering
+angleDiff = diff(polarAngleSorted);
 
-    fprintf('Grid                 = %d x %d\n',Nx,Ny);
-    fprintf('Receivers            = %d\n',nSensors);
-    fprintf('Reference c          = %.3f m/s\n',cRef);
-    fprintf('Interpolation        = %s\n',interpMethod);
-    fprintf('CF power             = %.3f\n',pCF);
-    fprintf('SCF power            = %.3f\n',pSCF);
+assert(all(angleDiff >= 0), ...
+    'Canonical polar-angle ordering failed.');
 
-    delayed = zeros( ...
-        Nx, ...
-        Ny, ...
-        nSensors, ...
-        'single');
+canonicalOrderWasAlreadyPresent = ...
+    isequal( ...
+    canonicalOrder(:), ...
+    (1:nSensors).');
 
-    active = false( ...
-        Nx, ...
-        Ny, ...
-        nSensors);
+fprintf('\nReceiver ordering audit\n');
+fprintf('---------------------------------------------\n');
 
-    tDelayStart = tic;
+fprintf('Canonical polar-angle ordering used = 1\n');
 
-    for m = 1:nSensors
+fprintf('Original order already canonical    = %d\n', ...
+    canonicalOrderWasAlreadyPresent);
 
-        rx = receiverPositions(m,1);
-        ry = receiverPositions(m,2);
+fprintf('Minimum angular spacing             = %.6f deg\n', ...
+    min(angleDiff)*180/pi);
 
-        distance = sqrt( ...
-            (X-rx).^2 + ...
-            (Y-ry).^2);
+fprintf('Maximum angular spacing             = %.6f deg\n', ...
+    max(angleDiff)*180/pi);
 
-        tau = distance/cRef;
 
-        activeM = ...
-            tau >= tArray(1) & ...
-            tau <= tArray(end);
+Nt = sim.kgrid.Nt;
+dt = double(sim.kgrid.dt);
 
-        contribution = interp1( ...
-            tArray, ...
-            rf(m,:), ...
-            tau, ...
-            interpMethod, ...
-            0);
+assert(size(rf,1)==nSensors, ...
+    'RF channels do not match receiver count.');
 
-        delayed(:,:,m) = ...
-            single(contribution);
+assert(size(rf,2)==Nt, ...
+    'RF temporal dimension does not match kgrid.Nt.');
 
-        active(:,:,m) = activeM;
-    end
+%% =========================================================
+% GRID
+% ==========================================================
 
-    delayRuntime = toc(tDelayStart);
+Nx = sim.kgrid.Nx;
+Ny = sim.kgrid.Ny;
 
-    fprintf('Delay preparation     = %.3f s\n', ...
-        delayRuntime);
+xVec = double(sim.kgrid.x_vec(:));
+yVec = double(sim.kgrid.y_vec(:));
 
-    %% =========================================================
-    % ACTIVE APERTURE
-    % ==========================================================
+[X,Y] = ndgrid(xVec,yVec);
 
-    Ma = sum(active,3);
+tArray = (0:Nt-1)*dt;
 
-    assert(all(Ma(:) >= 2), ...
-        'Some pixels have fewer than two active channels.');
+%% =========================================================
+% SHARED DELAYED CHANNEL TENSOR
+%
+% delayed(:,:,m) = x_m(r)
+% ==========================================================
 
-    MaSafe = max(double(Ma),1);
+fprintf('\n');
+fprintf('=============================================\n');
+fprintf('PUBLICATION BEAMFORMING ENGINE\n');
+fprintf('=============================================\n');
 
-    %% =========================================================
-    % SHARED BASIC SUMS
-    % ==========================================================
+fprintf('Grid                 = %d x %d\n',Nx,Ny);
+fprintf('Receivers            = %d\n',nSensors);
+fprintf('Reference c          = %.3f m/s\n',cRef);
+fprintf('Interpolation        = %s\n',interpMethod);
+fprintf('CF power             = %.3f\n',pCF);
+fprintf('SCF power            = %.3f\n',pSCF);
 
-    Xd = double(delayed);
+delayed = zeros( ...
+    Nx, ...
+    Ny, ...
+    nSensors, ...
+    'single');
 
-    sumX = sum(Xd,3);
+active = false( ...
+    Nx, ...
+    Ny, ...
+    nSensors);
 
-    sumX2 = sum(Xd.^2,3);
+tDelayStart = tic;
 
-    %% =========================================================
-    % 1. DAS
-    %
-    % uniform weights:
-    %
-    % P_DAS = sum(x_m) / M_a
-    % ==========================================================
+for m = 1:nSensors
 
-    tStart = tic;
+    rx = receiverPositions(m,1);
+    ry = receiverPositions(m,2);
 
-    DAS = ...
-        sumX ./ ...
-        (MaSafe + eps);
+    distance = sqrt( ...
+        (X-rx).^2 + ...
+        (Y-ry).^2);
 
-    runtimeDAS = toc(tStart);
+    tau = distance/cRef;
 
-    %% =========================================================
-    % 2. CF-DAS
-    %
-    % CF = |sum x|^2 / (M_a sum |x|^2)
-    % ==========================================================
+    activeM = ...
+        tau >= tArray(1) & ...
+        tau <= tArray(end);
 
-    tStart = tic;
+    contribution = interp1( ...
+        tArray, ...
+        rf(m,:), ...
+        tau, ...
+        interpMethod, ...
+        0);
 
-    CF = ...
-        abs(sumX).^2 ./ ...
-        ( ...
-        MaSafe .* sumX2 + ...
-        eps);
+    delayed(:,:,m) = ...
+        single(contribution);
 
-    CF = min(max(CF,0),1);
+    active(:,:,m) = activeM;
+end
 
-    CFDAS = ...
-        (CF.^pCF) .* DAS;
+delayRuntime = toc(tDelayStart);
 
-    runtimeCF = toc(tStart);
+fprintf('Delay preparation     = %.3f s\n', ...
+    delayRuntime);
 
-    %% =========================================================
-    % 3. SCF-DAS
-    %
-    % q_m = sign(x_m)
-    %
-    % mu_q = mean(q_m)
-    %
-    % v_q = mean(q_m^2) - mu_q^2
-    %
-    % SCF = max(0,1-sqrt(v_q))^p
-    % ==========================================================
+%% =========================================================
+% ACTIVE APERTURE
+% ==========================================================
 
-    tStart = tic;
+Ma = sum(active,3);
 
-    Q = sign(Xd);
+assert(all(Ma(:) >= 2), ...
+    'Some pixels have fewer than two active channels.');
 
-    sumQ = sum(Q,3);
-    sumQ2 = sum(Q.^2,3);
+MaSafe = max(double(Ma),1);
 
-    muQ = ...
-        sumQ ./ ...
-        MaSafe;
+%% =========================================================
+% SHARED BASIC SUMS
+% ==========================================================
 
-    vQ = ...
-        sumQ2 ./ MaSafe - ...
-        muQ.^2;
+Xd = double(delayed);
 
-    vQ = max(vQ,0);
+sumX = sum(Xd,3);
 
-    SCF = ...
-        max(0,1-sqrt(vQ)).^pSCF;
+sumX2 = sum(Xd.^2,3);
 
-    SCFDAS = ...
-        SCF .* DAS;
+%% =========================================================
+% 1. DAS
+%
+% uniform weights:
+%
+% P_DAS = sum(x_m) / M_a
+% ==========================================================
 
-    runtimeSCF = toc(tStart);
+tStart = tic;
 
-    %% =========================================================
-    % 4. DMAS
-    %
-    % z_m = sign(x_m)*sqrt(|x_m|)
-    %
-    % D = 1/2 [ (sum z)^2 - sum |x| ]
-    %
-    % pair-count normalized.
-    % ==========================================================
+DAS = ...
+    sumX ./ ...
+    (MaSafe + eps);
 
-    tStart = tic;
+runtimeDAS = toc(tStart);
 
-    Z = ...
-        sign(Xd) .* ...
-        sqrt(abs(Xd));
+%% =========================================================
+% 2. CF-DAS
+%
+% CF = |sum x|^2 / (M_a sum |x|^2)
+% ==========================================================
 
-    sumZ = sum(Z,3);
+tStart = tic;
 
-    sumAbsX = sum(abs(Xd),3);
+CF = ...
+    abs(sumX).^2 ./ ...
+    ( ...
+    MaSafe .* sumX2 + ...
+    eps);
 
-    dmasRaw = ...
-        0.5 .* ...
-        (sumZ.^2 - sumAbsX);
+CF = min(max(CF,0),1);
 
-    nPairs = ...
-        MaSafe .* ...
-        (MaSafe-1) ./ 2;
+CFDAS = ...
+    (CF.^pCF) .* DAS;
 
-    DMAS = ...
-        dmasRaw ./ ...
-        (nPairs + eps);
+runtimeCF = toc(tStart);
 
-    runtimeDMAS = toc(tStart);
+%% =========================================================
+% 3. SCF-DAS
+%
+% q_m = sign(x_m)
+%
+% mu_q = mean(q_m)
+%
+% v_q = mean(q_m^2) - mu_q^2
+%
+% SCF = max(0,1-sqrt(v_q))^p
+% ==========================================================
 
-    %% =========================================================
-    % 5. TRIANGULAR DS-DMAS
-    %
-    % Stage 1:
-    %
-    % T_i = sum_{j=i+1}^M z_i z_j
-    %
-    % We normalize each T_i by the number of active pairs
-    % available to that triangular row.
-    %
-    % Stage 2:
-    %
-    % sign-preserving DMAS among T_i values, followed by
-    % second-stage pair-count normalization.
-    % ==========================================================
+tStart = tic;
 
-    tStart = tic;
+Q = sign(Xd);
 
-    nStage1 = nSensors-1;
+sumQ = sum(Q,3);
+sumQ2 = sum(Q.^2,3);
 
-    T = zeros( ...
-        Nx, ...
-        Ny, ...
-        nStage1, ...
-        'single');
+muQ = ...
+    sumQ ./ ...
+    MaSafe;
 
-    for i = 1:nStage1
+vQ = ...
+    sumQ2 ./ MaSafe - ...
+    muQ.^2;
 
-        zi = Z(:,:,i);
+vQ = max(vQ,0);
+
+SCF = ...
+    max(0,1-sqrt(vQ)).^pSCF;
+
+SCFDAS = ...
+    SCF .* DAS;
+
+runtimeSCF = toc(tStart);
+
+%% =========================================================
+% 4. DMAS
+%
+% z_m = sign(x_m)*sqrt(|x_m|)
+%
+% D = 1/2 [ (sum z)^2 - sum |x| ]
+%
+% pair-count normalized.
+% ==========================================================
+
+tStart = tic;
+
+Z = ...
+    sign(Xd) .* ...
+    sqrt(abs(Xd));
+
+sumZ = sum(Z,3);
+
+sumAbsX = sum(abs(Xd),3);
+
+dmasRaw = ...
+    0.5 .* ...
+    (sumZ.^2 - sumAbsX);
+
+nPairs = ...
+    MaSafe .* ...
+    (MaSafe-1) ./ 2;
+
+DMAS = ...
+    dmasRaw ./ ...
+    (nPairs + eps);
+
+runtimeDMAS = toc(tStart);
+
+%% =========================================================
+% 5. TRIANGULAR DS-DMAS
+%
+% Stage 1:
+%
+% T_i = sum_{j=i+1}^M z_i z_j
+%
+% We normalize each T_i by the number of active pairs
+% available to that triangular row.
+%
+% Stage 2:
+%
+% sign-preserving DMAS among T_i values, followed by
+% second-stage pair-count normalization.
+% ==========================================================
+
+tStart = tic;
+
+nStage1 = nSensors-1;
+
+T = zeros( ...
+    Nx, ...
+    Ny, ...
+    nStage1, ...
+    'single');
+
+for i = 1:nStage1
+
+    zi = Z(:,:,i);
+
+    stage1Sum = ...
+        zeros(Nx,Ny);
+
+    stage1Count = ...
+        zeros(Nx,Ny);
+
+    for j = i+1:nSensors
+
+        pairActive = ...
+            active(:,:,i) & ...
+            active(:,:,j);
+
+        term = ...
+            zi .* Z(:,:,j);
 
         stage1Sum = ...
-            zeros(Nx,Ny);
+            stage1Sum + ...
+            term .* double(pairActive);
 
         stage1Count = ...
-            zeros(Nx,Ny);
-
-        for j = i+1:nSensors
-
-            pairActive = ...
-                active(:,:,i) & ...
-                active(:,:,j);
-
-            term = ...
-                zi .* Z(:,:,j);
-
-            stage1Sum = ...
-                stage1Sum + ...
-                term .* double(pairActive);
-
-            stage1Count = ...
-                stage1Count + ...
-                double(pairActive);
-        end
-
-        T(:,:,i) = single( ...
-            stage1Sum ./ ...
-            (stage1Count + eps));
+            stage1Count + ...
+            double(pairActive);
     end
 
-    % Sign-preserving transform for second stage
-    TZ = ...
-        sign(double(T)) .* ...
-        sqrt(abs(double(T)));
+    T(:,:,i) = single( ...
+        stage1Sum ./ ...
+        (stage1Count + eps));
+end
 
-    sumTZ = sum(TZ,3);
+% Sign-preserving transform for second stage
+TZ = ...
+    sign(double(T)) .* ...
+    sqrt(abs(double(T)));
 
-    sumAbsT = ...
-        sum(abs(double(T)),3);
+sumTZ = sum(TZ,3);
 
-    dsRaw = ...
-        0.5 .* ...
-        (sumTZ.^2 - sumAbsT);
+sumAbsT = ...
+    sum(abs(double(T)),3);
 
-    % Number of stage-2 triangular pairs
-    nPairsStage2 = ...
-        nStage1*(nStage1-1)/2;
+dsRaw = ...
+    0.5 .* ...
+    (sumTZ.^2 - sumAbsT);
 
-    DSDMAS = ...
-        dsRaw ./ ...
-        (nPairsStage2 + eps);
+% Number of stage-2 triangular pairs
+nPairsStage2 = ...
+    nStage1*(nStage1-1)/2;
 
-    runtimeDS = toc(tStart);
+DSDMAS = ...
+    dsRaw ./ ...
+    (nPairsStage2 + eps);
 
-    %% =========================================================
-    % OUTPUT
-    % ==========================================================
+runtimeDS = toc(tStart);
 
-    recons = struct();
+%% =========================================================
+% OUTPUT
+% ==========================================================
 
-    recons.DAS = DAS;
-    recons.CFDAS = CFDAS;
-    recons.SCFDAS = SCFDAS;
-    recons.DMAS = DMAS;
-    recons.DSDMAS = DSDMAS;
+recons = struct();
 
-    %% =========================================================
-    % INFO
-    % ==========================================================
+recons.DAS = DAS;
+recons.CFDAS = CFDAS;
+recons.SCFDAS = SCFDAS;
+recons.DMAS = DMAS;
+recons.DSDMAS = DSDMAS;
 
-    info = struct();
+%% =========================================================
+% INFO
+% ==========================================================
 
-    info.reference_sound_speed = cRef;
-    info.interpolation = interpMethod;
+info = struct();
 
-    info.cf_power = pCF;
-    info.scf_power = pSCF;
+info.reference_sound_speed = cRef;
+info.interpolation = interpMethod;
 
-    info.active_aperture_normalization = true;
+info.cf_power = pCF;
+info.scf_power = pSCF;
 
-    info.dmas_pair_normalization = true;
+info.active_aperture_normalization = true;
 
-    info.ds_dmas_formulation = ...
-        'triangular_two_stage';
+info.dmas_pair_normalization = true;
 
-    info.use_physical_receiver_centres = true;
+info.ds_dmas_formulation = ...
+    'triangular_two_stage';
 
-    info.delay_runtime_s = delayRuntime;
+info.use_physical_receiver_centres = true;
 
-    info.runtime_DAS_s = runtimeDAS;
-    info.runtime_CFDAS_s = runtimeCF;
-    info.runtime_SCFDAS_s = runtimeSCF;
-    info.runtime_DMAS_s = runtimeDMAS;
-    info.runtime_DSDMAS_s = runtimeDS;
+info.delay_runtime_s = delayRuntime;
 
-    fprintf('\nAlgorithm runtimes after shared delays:\n');
+info.runtime_DAS_s = runtimeDAS;
+info.runtime_CFDAS_s = runtimeCF;
+info.runtime_SCFDAS_s = runtimeSCF;
+info.runtime_DMAS_s = runtimeDMAS;
+info.runtime_DSDMAS_s = runtimeDS;
 
-    fprintf('DAS       = %.4f s\n',runtimeDAS);
-    fprintf('CF-DAS    = %.4f s\n',runtimeCF);
-    fprintf('SCF-DAS   = %.4f s\n',runtimeSCF);
-    fprintf('DMAS      = %.4f s\n',runtimeDMAS);
-    fprintf('DS-DMAS   = %.4f s\n',runtimeDS);
+fprintf('\nAlgorithm runtimes after shared delays:\n');
 
-    fprintf('\nPublication beamforming: COMPLETE\n');
-    fprintf('=============================================\n');
+fprintf('DAS       = %.4f s\n',runtimeDAS);
+fprintf('CF-DAS    = %.4f s\n',runtimeCF);
+fprintf('SCF-DAS   = %.4f s\n',runtimeSCF);
+fprintf('DMAS      = %.4f s\n',runtimeDMAS);
+fprintf('DS-DMAS   = %.4f s\n',runtimeDS);
+
+fprintf('\nPublication beamforming: COMPLETE\n');
+fprintf('=============================================\n');
+
+
+info.channel_ordering = ...
+    'increasing_polar_angle';
+
+info.canonical_order_was_already_present = ...
+    canonicalOrderWasAlreadyPresent;
+
+info.canonical_order = ...
+    canonicalOrder;
+
+info.array_center_m = ...
+    arrayCenter;
+
+info.total_runtime_DAS_s = ...
+    delayRuntime + runtimeDAS;
+
+info.total_runtime_CFDAS_s = ...
+    delayRuntime + runtimeCF;
+
+info.total_runtime_SCFDAS_s = ...
+    delayRuntime + runtimeSCF;
+
+info.total_runtime_DMAS_s = ...
+    delayRuntime + runtimeDMAS;
+
+info.total_runtime_DSDMAS_s = ...
+    delayRuntime + runtimeDS;
+
+fprintf('\nEstimated complete reconstruction runtimes:\n');
+
+fprintf('DAS       = %.4f s\n', ...
+    info.total_runtime_DAS_s);
+
+fprintf('CF-DAS    = %.4f s\n', ...
+    info.total_runtime_CFDAS_s);
+
+fprintf('SCF-DAS   = %.4f s\n', ...
+    info.total_runtime_SCFDAS_s);
+
+fprintf('DMAS      = %.4f s\n', ...
+    info.total_runtime_DMAS_s);
+
+fprintf('DS-DMAS   = %.4f s\n', ...
+    info.total_runtime_DSDMAS_s);
 
 end
