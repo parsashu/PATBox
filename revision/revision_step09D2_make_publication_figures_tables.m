@@ -242,7 +242,8 @@ ylabel(ax1, ...
 title(ax1,'A  Ranking convergence');
 
 xlim(ax1,[8 52]);
-ylim(ax1,[0 1.04]);
+ylim(ax1,[0.80 1.01]);
+yticks(ax1,0.80:0.05:1.00);
 
 xticks(ax1,N);
 
@@ -304,8 +305,8 @@ ylabel(ax2, ...
 title(ax2,'B  Highest-ranked method');
 
 xlim(ax2,[8 52]);
-ylim(ax2,[0 1.12]);
-
+ylim(ax2,[0.88 1.03]);
+yticks(ax2,[0.90 0.95 1.00]);
 xticks(ax2,N);
 
 yticks(ax2,0:0.2:1);
@@ -453,16 +454,15 @@ imagesc( ...
     1:numel(metricOrder), ...
     Wmatrix);
 
-set(ax,'YDir','normal');
+set(ax,'YDir','reverse');
 
-caxis(ax,[0 1]);
+caxis(ax,[0.85 1.00]);
 
 colormap(ax,parula(256));
 
 cb = colorbar(ax);
 
-ylabel(cb,'Kendall''s W');
-
+ylabel(cb,'Kendall''s W (display range 0.85-1.00)');
 xticks(ax,snrLevels);
 
 yticks(ax,1:numel(metricOrder));
@@ -610,8 +610,7 @@ for c = 1:nContrasts
         1:numel(metricOrder), ...
         effectMatrix);
 
-    set(axc,'YDir','normal');
-
+set(axc,'YDir','reverse');
     caxis(axc,[-1 1]);
 
     colormap(axc,localDivergingMap(256));
@@ -684,8 +683,7 @@ ylabel( ...
 
 title( ...
     tl3, ...
-    ['Selected paired effect sizes; * denotes ' ...
-     'Holm-significant primary comparison'], ...
+    'Selected paired effect sizes', ...
     'FontWeight','bold');
 
 effectFigurePNG = fullfile( ...
