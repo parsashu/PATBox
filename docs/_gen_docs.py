@@ -22,13 +22,10 @@ NAV = [
 
 def shell(active: str, title: str, description: str, body: str) -> str:
     links = []
-    mobile = []
     for href, label in NAV:
         cls = ' class="active"' if href == active else ""
         links.append(f'<a href="{href}"{cls}>{label}</a>')
-        mobile.append(f'<a href="{href}">{label}</a>')
-    nav = "\n          ".join(links)
-    mobile_nav = "\n      ".join(mobile)
+    nav = "\n        ".join(links)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,35 +40,38 @@ def shell(active: str, title: str, description: str, body: str) -> str:
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="nav-inner">
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
       <a class="brand" href="index.html">
-        <img class="brand-mark" src="assets/logo.svg" alt="" width="34" height="34" />
-        PATBox <span>v0.6.7-physics-core</span>
+        <img class="brand-mark" src="assets/logo.svg" alt="" width="32" height="32" />
+        <span class="brand-text">PATBox <small>v0.6.7</small></span>
       </a>
-      <nav class="nav-links">
-          {nav}
-          <a class="github-link" href="{GITHUB}" target="_blank" rel="noopener">GitHub</a>
+      <nav class="side-nav" aria-label="Documentation">
+        {nav}
       </nav>
-      <button class="nav-toggle" type="button" aria-label="Open menu">Menu</button>
-    </div>
-  </header>
-  <div class="mobile-nav" id="mobile-nav">
-      {mobile_nav}
-      <a href="{GITHUB}" target="_blank" rel="noopener">GitHub</a>
-  </div>
-  <main>
+      <a class="side-github" href="{GITHUB}" target="_blank" rel="noopener">GitHub</a>
+    </aside>
+    <div class="shell">
+      <header class="topbar">
+        <button class="nav-toggle" type="button" aria-label="Open menu" aria-controls="sidebar">Menu</button>
+        <div class="topbar-title">{title}</div>
+        <a class="topbar-github" href="{GITHUB}" target="_blank" rel="noopener">GitHub</a>
+      </header>
+      <main class="content">
 {body}
-  </main>
-  <footer class="site-footer">
-    <div class="inner">
-      <div class="footer-brand">
-        <img src="assets/logo.svg" alt="" width="24" height="24" />
-        <span>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></span>
-      </div>
-      <div><a href="{GITHUB}">github.com/parsashu/PATBox</a></div>
+      </main>
+      <footer class="site-footer">
+        <div class="inner">
+          <div class="footer-brand">
+            <img src="assets/logo.svg" alt="" width="24" height="24" />
+            <span>PATBox · MIT · <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></span>
+          </div>
+          <div><a href="{GITHUB}">github.com/parsashu/PATBox</a></div>
+        </div>
+      </footer>
     </div>
-  </footer>
+  </div>
+  <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
   <script src="assets/site.js"></script>
 </body>
 </html>
@@ -84,133 +84,26 @@ PAGES["index.html"] = (
     "Overview",
     "PATBox is a MATLAB toolbox for photoacoustic forward simulation and reconstruction.",
     r"""
-    <section class="hero">
-      <div class="hero-layout">
-        <div>
-          <div class="kicker">MATLAB photoacoustic toolbox</div>
-          <h1>Simulate. Reconstruct. Compare.</h1>
-          <p>
-            PATBox is a thin, physics-aware API over k-Wave forward simulation and a suite of
-            delay-and-sum family reconstruction methods. Tune sensors, media, noise, and algorithms
-            from <code>params.yaml</code> — then evaluate image quality in one call.
-          </p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="install.html">Install</a>
-            <a class="btn btn-ghost" href="quickstart.html">Quick start</a>
-            <a class="btn btn-ghost" href="api.html">API reference</a>
-          </div>
-        </div>
-        <div class="hero-visual">
-          <img src="assets/patbox-hero.png" alt="Photoacoustic waves propagating toward a sensor array" width="960" height="600" />
-          <div class="hero-badge">
-            <img src="assets/logo.svg" alt="" width="18" height="18" />
-            Physics-aware PAT pipeline
-          </div>
-        </div>
+    <section class="hero hero-simple">
+      <div class="kicker">MATLAB · photoacoustic</div>
+      <h1>PATBox</h1>
+      <p class="lead">
+        Simulate with k-Wave. Reconstruct with fifteen algorithms. Configure from <code>params.yaml</code>.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="install.html">Install</a>
+        <a class="btn btn-ghost" href="quickstart.html">Quick start</a>
       </div>
     </section>
 
     <figure class="pipeline-figure">
-      <img src="assets/pipeline.svg" alt="PATBox pipeline from initial pressure to RF sensor data" width="720" height="220" />
+      <img src="assets/recon/comparison_montage.png" alt="Phantom and reconstruction comparison" width="932" height="652" loading="lazy" />
     </figure>
-    <p class="figure-caption">From initial pressure → wave propagation → array sensing → RF channels.</p>
+    <p class="figure-caption">Example1 phantom and linear-array reconstructions.</p>
 
-    <section class="grid grid-3">
-      <article class="panel">
-        <img class="panel-icon" src="assets/patbox-mark.png" alt="" width="42" height="42" />
-        <h3>Physics-aware simulation</h3>
-        <p class="muted">Linear, square, circular, and arc arrays with finite-element sensors, heterogeneous media, attenuation, and calibrated acquisition noise.</p>
-        <p><a href="simulation.html">Simulation modules →</a></p>
-      </article>
-      <article class="panel">
-        <img class="panel-icon" src="assets/logo.svg" alt="" width="42" height="42" />
-        <h3>15 reconstruction algorithms</h3>
-        <p class="muted">DAS, DMAS, coherence and MV variants, FBP/UBP hybrids, time reversal, and iterative solvers behind one dispatcher.</p>
-        <p><a href="reconstruction.html">Algorithms →</a></p>
-      </article>
-      <article class="panel">
-        <img class="panel-icon" src="assets/patbox-mark.png" alt="" width="42" height="42" />
-        <h3>YAML-first workflow</h3>
-        <p class="muted">Defaults live in <code>params.yaml</code>. Override any field at runtime with name-value pairs.</p>
-        <p><a href="configuration.html">Configuration →</a></p>
-      </article>
-    </section>
-
-    <h2>What PATBox is for</h2>
-    <p>
-      PATBox targets researchers who need a reproducible 2-D photoacoustic pipeline:
-      generate sensor data from an initial-pressure image, reconstruct with multiple algorithms
-      under identical conditions, and score results with standard image-quality metrics.
-    </p>
-    <ul>
-      <li>Benchmark reconstruction algorithms on the same acquisition</li>
-      <li>Study sensor geometry (limited view, pitch, directivity)</li>
-      <li>Inject controlled noise via <code>TargetSNRdB</code></li>
-      <li>Swap homogeneous / heterogeneous / attenuating media</li>
-    </ul>
-
-    <h2>Sample reconstructions</h2>
-    <p class="muted">Linear-array reconstructions of the Example1 vessel phantom — see the <a href="reconstruction.html">Reconstruction</a> page for the full set.</p>
-    <figure class="pipeline-figure">
-      <img src="assets/recon/comparison_montage.png" alt="Comparison of phantom, TR, UBP, DMAS, DAS, and FBP reconstructions" width="932" height="652" loading="lazy" />
-    </figure>
-    <p class="figure-caption">Same acquisition, different algorithms (linear array).</p>
-    <div class="gallery">
-      <figure>
-        <img src="assets/recon/phantom_example1.png" alt="Example1 vessel phantom" width="512" height="512" loading="lazy" />
-        <figcaption>Phantom</figcaption>
-      </figure>
-      <figure>
-        <img src="assets/recon/tr.png" alt="Time-reversal reconstruction" width="512" height="512" loading="lazy" />
-        <figcaption>TR</figcaption>
-      </figure>
-      <figure>
-        <img src="assets/recon/dmas.png" alt="DMAS reconstruction" width="512" height="512" loading="lazy" />
-        <figcaption>DMAS</figcaption>
-      </figure>
-      <figure>
-        <img src="assets/recon/das.png" alt="DAS reconstruction" width="512" height="512" loading="lazy" />
-        <figcaption>DAS</figcaption>
-      </figure>
-      <figure>
-        <img src="assets/recon/ubp.png" alt="UBP reconstruction" width="512" height="512" loading="lazy" />
-        <figcaption>UBP</figcaption>
-      </figure>
-      <figure>
-        <img src="assets/recon/fbp.png" alt="FBP reconstruction" width="512" height="512" loading="lazy" />
-        <figcaption>FBP</figcaption>
-      </figure>
-    </div>
-
-    <h2>Minimal example</h2>
 <pre><code>install_patbox('/path/to/k-Wave')
-
 [p0, sim, info, metrics] = patReconImage('data/Example1.bmp', ...
-    'SensorType', 'linear', ...
-    'TargetSNRdB', 20, ...
-    'Algorithm', 'DMAS');
-
-fprintf('%s | PSNR %.2f dB | SSIM %.3f\n', ...
-    info.algorithm, metrics.psnr, metrics.ssim);</code></pre>
-
-    <h2>Documentation map</h2>
-    <div class="grid grid-2">
-      <div class="panel">
-        <h3>Start here</h3>
-        <p><a href="install.html">Installation</a> · <a href="quickstart.html">Quick start</a> · <a href="examples.html">Examples</a></p>
-      </div>
-      <div class="panel">
-        <h3>Go deeper</h3>
-        <p><a href="architecture.html">Architecture</a> · <a href="simulation.html">Simulation</a> · <a href="modules.html">Modules</a> · <a href="reconstruction.html">Reconstruction</a> · <a href="api.html">API</a> · <a href="configuration.html">Configuration</a> · <a href="faq.html">FAQ</a></p>
-      </div>
-    </div>
-
-    <div class="callout">
-      <p><strong>Dependency.</strong> Forward simulation requires
-      <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a>.
-      Documentation structure follows the same Getting Started → modules → API pattern
-      used by packages such as k-Wave and j-Wave, adapted for a MATLAB reconstruction toolbox.</p>
-    </div>
+    'SensorType', 'linear', 'TargetSNRdB', 20, 'Algorithm', 'DMAS');</code></pre>
 """,
 )
 

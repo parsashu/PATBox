@@ -1,14 +1,31 @@
 document.addEventListener("DOMContentLoaded", () => {
   const toggle = document.querySelector(".nav-toggle");
-  const mobile = document.querySelector("#mobile-nav");
-  if (toggle && mobile) {
+  const sidebar = document.querySelector("#sidebar");
+  const backdrop = document.querySelector("#sidebar-backdrop");
+
+  const close = () => {
+    document.body.classList.remove("sidebar-open");
+    if (backdrop) backdrop.hidden = true;
+  };
+
+  const open = () => {
+    document.body.classList.add("sidebar-open");
+    if (backdrop) backdrop.hidden = false;
+  };
+
+  if (toggle && sidebar) {
     toggle.addEventListener("click", () => {
-      mobile.classList.toggle("open");
+      if (document.body.classList.contains("sidebar-open")) close();
+      else open();
     });
   }
 
+  if (backdrop) {
+    backdrop.addEventListener("click", close);
+  }
+
   const targets = document.querySelectorAll(
-    ".panel, .callout, .table-wrap, .pipeline-figure, .hero-visual, pre, .gallery figure"
+    ".panel, .callout, .table-wrap, .pipeline-figure, pre, .gallery figure"
   );
   targets.forEach((el) => el.classList.add("reveal"));
 
