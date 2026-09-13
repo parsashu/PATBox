@@ -103,7 +103,7 @@ PAGES["index.html"] = (
 
 <pre><code>install_patbox('/path/to/k-Wave')
 [p0, sim, info, metrics] = patReconImage('data/Example1.bmp', ...
-    'SensorType', 'linear', 'TargetSNRdB', 20, 'Algorithm', 'DMAS');</code></pre>
+    'SensorType', 'circular', 'TargetSNRdB', 20, 'Algorithm', 'DMAS');</code></pre>
 """,
 )
 
