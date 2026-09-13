@@ -35,7 +35,7 @@ def shell(active: str, title: str, description: str, body: str) -> str:
   <meta name="description" content="{description}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,650&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/style.css" />
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
 </head>
@@ -99,7 +99,7 @@ PAGES["index.html"] = (
     <figure class="pipeline-figure">
       <img src="assets/recon/comparison_montage.png" alt="Phantom and reconstruction comparison" width="932" height="652" loading="lazy" />
     </figure>
-    <p class="figure-caption">Example1 phantom and linear-array reconstructions.</p>
+    <p class="figure-caption">Example1 phantom and circular-array reconstructions.</p>
 
 <pre><code>install_patbox('/path/to/k-Wave')
 [p0, sim, info, metrics] = patReconImage('data/Example1.bmp', ...
@@ -325,7 +325,7 @@ PAGES["reconstruction.html"] = (
     <p class="lead">All algorithms are dispatched by <code>patReconstruct</code> through <code>getReconFunction</code>.</p>
 
     <h2>Example reconstructions</h2>
-    <p class="muted">Same linear-array acquisition of <code>data/Example1.bmp</code>, reconstructed with different algorithms.</p>
+    <p class="muted">Same circular-array acquisition of <code>data/Example1.bmp</code>, reconstructed with different algorithms.</p>
     <figure class="pipeline-figure">
       <img src="assets/recon/comparison_montage.png" alt="Side-by-side reconstruction comparison montage" width="932" height="652" loading="lazy" />
     </figure>
