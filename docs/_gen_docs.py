@@ -151,26 +151,30 @@ PAGES["index.html"] = (
 
     <h2>Sample reconstructions</h2>
     <p class="muted">Linear-array reconstructions of the Example1 vessel phantom — see the <a href="reconstruction.html">Reconstruction</a> page for the full set.</p>
+    <figure class="pipeline-figure">
+      <img src="assets/recon/comparison_montage.png" alt="Comparison of phantom, TR, UBP, DMAS, DAS, and FBP reconstructions" width="932" height="652" loading="lazy" />
+    </figure>
+    <p class="figure-caption">Same acquisition, different algorithms (linear array).</p>
     <div class="gallery">
       <figure>
         <img src="assets/recon/phantom_example1.png" alt="Example1 vessel phantom" width="512" height="512" loading="lazy" />
         <figcaption>Phantom</figcaption>
       </figure>
       <figure>
-        <img src="assets/recon/dmas.png" alt="DMAS reconstruction" width="512" height="512" loading="lazy" />
-        <figcaption>DMAS</figcaption>
-      </figure>
-      <figure>
         <img src="assets/recon/tr.png" alt="Time-reversal reconstruction" width="512" height="512" loading="lazy" />
         <figcaption>TR</figcaption>
       </figure>
       <figure>
-        <img src="assets/recon/ubp.png" alt="UBP reconstruction" width="512" height="512" loading="lazy" />
-        <figcaption>UBP</figcaption>
+        <img src="assets/recon/dmas.png" alt="DMAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>DMAS</figcaption>
       </figure>
       <figure>
-        <img src="assets/recon/ds_dmas.png" alt="DS-DMAS reconstruction" width="512" height="512" loading="lazy" />
-        <figcaption>DS-DMAS</figcaption>
+        <img src="assets/recon/das.png" alt="DAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>DAS</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/ubp.png" alt="UBP reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>UBP</figcaption>
       </figure>
       <figure>
         <img src="assets/recon/fbp.png" alt="FBP reconstruction" width="512" height="512" loading="lazy" />
@@ -429,6 +433,10 @@ PAGES["reconstruction.html"] = (
 
     <h2>Example reconstructions</h2>
     <p class="muted">Same linear-array acquisition of <code>data/Example1.bmp</code>, reconstructed with different algorithms.</p>
+    <figure class="pipeline-figure">
+      <img src="assets/recon/comparison_montage.png" alt="Side-by-side reconstruction comparison montage" width="932" height="652" loading="lazy" />
+    </figure>
+    <p class="figure-caption">Overview: phantom vs TR, UBP, DMAS, DAS, FBP.</p>
     <div class="gallery gallery-4">
       <figure>
         <img src="assets/recon/phantom_example1.png" alt="Example1 vessel phantom" width="512" height="512" loading="lazy" />
