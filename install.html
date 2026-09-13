@@ -12,44 +12,34 @@
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="nav-inner">
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
       <a class="brand" href="index.html">
-        <img class="brand-mark" src="assets/logo.svg" alt="" width="34" height="34" />
-        PATBox <span>v0.6.7-physics-core</span>
+        <img class="brand-mark" src="assets/logo.svg" alt="" width="32" height="32" />
+        <span class="brand-text">PATBox <small>v0.6.7</small></span>
       </a>
-      <nav class="nav-links">
-          <a href="index.html">Overview</a>
-          <a href="install.html" class="active">Install</a>
-          <a href="quickstart.html">Quick start</a>
-          <a href="simulation.html">Simulation</a>
-          <a href="modules.html">Modules</a>
-          <a href="reconstruction.html">Reconstruction</a>
-          <a href="architecture.html">Architecture</a>
-          <a href="api.html">API</a>
-          <a href="configuration.html">Configuration</a>
-          <a href="examples.html">Examples</a>
-          <a href="faq.html">FAQ</a>
-          <a class="github-link" href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+      <nav class="side-nav" aria-label="Documentation">
+        <a href="index.html">Overview</a>
+        <a href="install.html" class="active">Install</a>
+        <a href="quickstart.html">Quick start</a>
+        <a href="simulation.html">Simulation</a>
+        <a href="modules.html">Modules</a>
+        <a href="reconstruction.html">Reconstruction</a>
+        <a href="architecture.html">Architecture</a>
+        <a href="api.html">API</a>
+        <a href="configuration.html">Configuration</a>
+        <a href="examples.html">Examples</a>
+        <a href="faq.html">FAQ</a>
       </nav>
-      <button class="nav-toggle" type="button" aria-label="Open menu">Menu</button>
-    </div>
-  </header>
-  <div class="mobile-nav" id="mobile-nav">
-      <a href="index.html">Overview</a>
-      <a href="install.html">Install</a>
-      <a href="quickstart.html">Quick start</a>
-      <a href="simulation.html">Simulation</a>
-      <a href="modules.html">Modules</a>
-      <a href="reconstruction.html">Reconstruction</a>
-      <a href="architecture.html">Architecture</a>
-      <a href="api.html">API</a>
-      <a href="configuration.html">Configuration</a>
-      <a href="examples.html">Examples</a>
-      <a href="faq.html">FAQ</a>
-      <a href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
-  </div>
-  <main>
+      <a class="side-github" href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+    </aside>
+    <div class="shell">
+      <header class="topbar">
+        <button class="nav-toggle" type="button" aria-label="Open menu" aria-controls="sidebar">Menu</button>
+        <div class="topbar-title">Install</div>
+        <a class="topbar-github" href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+      </header>
+      <main class="content">
 
     <p class="kicker">Setup</p>
     <h1 class="page-title">Installation</h1>
@@ -112,16 +102,19 @@ reconstruct_image</code></pre>
       </table>
     </div>
 
-  </main>
-  <footer class="site-footer">
-    <div class="inner">
-      <div class="footer-brand">
-        <img src="assets/logo.svg" alt="" width="24" height="24" />
-        <span>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></span>
-      </div>
-      <div><a href="https://github.com/parsashu/PATBox">github.com/parsashu/PATBox</a></div>
+      </main>
+      <footer class="site-footer">
+        <div class="inner">
+          <div class="footer-brand">
+            <img src="assets/logo.svg" alt="" width="24" height="24" />
+            <span>PATBox · MIT · <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></span>
+          </div>
+          <div><a href="https://github.com/parsashu/PATBox">github.com/parsashu/PATBox</a></div>
+        </div>
+      </footer>
     </div>
-  </footer>
+  </div>
+  <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
   <script src="assets/site.js"></script>
 </body>
 </html>
