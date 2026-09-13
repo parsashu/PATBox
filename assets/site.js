@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const targets = document.querySelectorAll(
-    ".panel, .callout, .table-wrap, .pipeline-figure, .hero-visual, pre"
+    ".panel, .callout, .table-wrap, .pipeline-figure, .hero-visual, pre, .gallery figure"
   );
   targets.forEach((el) => el.classList.add("reveal"));
 

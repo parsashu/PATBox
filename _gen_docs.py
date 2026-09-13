@@ -149,6 +149,35 @@ PAGES["index.html"] = (
       <li>Swap homogeneous / heterogeneous / attenuating media</li>
     </ul>
 
+    <h2>Sample reconstructions</h2>
+    <p class="muted">Linear-array reconstructions of the Example1 vessel phantom — see the <a href="reconstruction.html">Reconstruction</a> page for the full set.</p>
+    <div class="gallery">
+      <figure>
+        <img src="assets/recon/phantom_example1.png" alt="Example1 vessel phantom" width="512" height="512" loading="lazy" />
+        <figcaption>Phantom</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/dmas.png" alt="DMAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>DMAS</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/tr.png" alt="Time-reversal reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>TR</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/ubp.png" alt="UBP reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>UBP</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/ds_dmas.png" alt="DS-DMAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>DS-DMAS</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/fbp.png" alt="FBP reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>FBP</figcaption>
+      </figure>
+    </div>
+
     <h2>Minimal example</h2>
 <pre><code>install_patbox('/path/to/k-Wave')
 
@@ -397,6 +426,59 @@ PAGES["reconstruction.html"] = (
     <p class="kicker">Algorithms</p>
     <h1 class="page-title">Reconstruction</h1>
     <p class="lead">All algorithms are dispatched by <code>patReconstruct</code> through <code>getReconFunction</code>.</p>
+
+    <h2>Example reconstructions</h2>
+    <p class="muted">Same linear-array acquisition of <code>data/Example1.bmp</code>, reconstructed with different algorithms.</p>
+    <div class="gallery gallery-4">
+      <figure>
+        <img src="assets/recon/phantom_example1.png" alt="Example1 vessel phantom" width="512" height="512" loading="lazy" />
+        <figcaption>Phantom · Example1</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/das.png" alt="DAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>DAS</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/dmas.png" alt="DMAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>DMAS</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/ds_dmas.png" alt="DS-DMAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>DS-DMAS</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/cf_das.png" alt="CF-DAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>CF-DAS</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/vdas.png" alt="VDAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>VDAS</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/fbp.png" alt="FBP reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>FBP</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/ubp.png" alt="UBP reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>UBP</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/tr.png" alt="Time-reversal reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>TR</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/scf_das.png" alt="SCF-DAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>SCF-DAS</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/dmas_ubp.png" alt="DMAS-UBP reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>DMAS-UBP</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/mv_das.png" alt="MV-DAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>MV-DAS</figcaption>
+      </figure>
+    </div>
 
     <h2>Supported names</h2>
 <pre><code>patListAlgorithms
@@ -878,6 +960,34 @@ PAGES["examples.html"] = (
     <p class="kicker">Scripts</p>
     <h1 class="page-title">Examples</h1>
     <p class="lead">Example scripts live in <code>examples/</code> and read defaults from <code>params.yaml</code>.</p>
+
+    <h2>Sample outputs</h2>
+    <div class="gallery">
+      <figure>
+        <img src="assets/recon/das.png" alt="DAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>DAS</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/dmas.png" alt="DMAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>DMAS</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/ubp.png" alt="UBP reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>UBP</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/tr.png" alt="TR reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>TR</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/vdas.png" alt="VDAS reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>VDAS</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/recon/dmas_ubp.png" alt="DMAS-UBP reconstruction" width="512" height="512" loading="lazy" />
+        <figcaption>DMAS-UBP</figcaption>
+      </figure>
+    </div>
 
     <h2>reconstruct_image.m</h2>
     <p>Minimal end-to-end demo: simulate → reconstruct (default algorithm) → evaluate → side-by-side figure.</p>
