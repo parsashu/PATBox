@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Overview · PATBox</title>
+  <meta name="description" content="PATBox is a MATLAB toolbox for photoacoustic forward simulation and reconstruction." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">PATBox <span>v0.6.7-physics-core</span></a>
+      <nav class="nav-links">
+          <a href="index.html" class="active">Overview</a>
+          <a href="install.html">Install</a>
+          <a href="quickstart.html">Quick start</a>
+          <a href="simulation.html">Simulation</a>
+          <a href="modules.html">Modules</a>
+          <a href="reconstruction.html">Reconstruction</a>
+          <a href="architecture.html">Architecture</a>
+          <a href="api.html">API</a>
+          <a href="configuration.html">Configuration</a>
+          <a href="examples.html">Examples</a>
+          <a href="faq.html">FAQ</a>
+          <a class="github-link" href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <button class="nav-toggle" type="button" aria-label="Open menu">Menu</button>
+    </div>
+  </header>
+  <div class="mobile-nav" id="mobile-nav">
+      <a href="index.html">Overview</a>
+      <a href="install.html">Install</a>
+      <a href="quickstart.html">Quick start</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="modules.html">Modules</a>
+      <a href="reconstruction.html">Reconstruction</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="api.html">API</a>
+      <a href="configuration.html">Configuration</a>
+      <a href="examples.html">Examples</a>
+      <a href="faq.html">FAQ</a>
+      <a href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <main>
+
+    <section class="hero">
+      <div class="kicker">MATLAB photoacoustic toolbox</div>
+      <h1>Simulate. Reconstruct. Compare.</h1>
+      <p>
+        PATBox is a thin, physics-aware API over k-Wave forward simulation and a suite of
+        delay-and-sum family reconstruction methods. Tune sensors, media, noise, and algorithms
+        from <code>params.yaml</code> — then evaluate image quality in one call.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="install.html">Install</a>
+        <a class="btn btn-ghost" href="quickstart.html">Quick start</a>
+        <a class="btn btn-ghost" href="api.html">API reference</a>
+      </div>
+    </section>
+
+    <section class="grid grid-3">
+      <article class="panel">
+        <h3>Physics-aware simulation</h3>
+        <p class="muted">Linear, square, circular, and arc arrays with finite-element sensors, heterogeneous media, attenuation, and calibrated acquisition noise.</p>
+        <p><a href="simulation.html">Simulation modules →</a></p>
+      </article>
+      <article class="panel">
+        <h3>15 reconstruction algorithms</h3>
+        <p class="muted">DAS, DMAS, coherence and MV variants, FBP/UBP hybrids, time reversal, and iterative solvers behind one dispatcher.</p>
+        <p><a href="reconstruction.html">Algorithms →</a></p>
+      </article>
+      <article class="panel">
+        <h3>YAML-first workflow</h3>
+        <p class="muted">Defaults live in <code>params.yaml</code>. Override any field at runtime with name-value pairs.</p>
+        <p><a href="configuration.html">Configuration →</a></p>
+      </article>
+    </section>
+
+    <h2>What PATBox is for</h2>
+    <p>
+      PATBox targets researchers who need a reproducible 2-D photoacoustic pipeline:
+      generate sensor data from an initial-pressure image, reconstruct with multiple algorithms
+      under identical conditions, and score results with standard image-quality metrics.
+    </p>
+    <ul>
+      <li>Benchmark reconstruction algorithms on the same acquisition</li>
+      <li>Study sensor geometry (limited view, pitch, directivity)</li>
+      <li>Inject controlled noise via <code>TargetSNRdB</code></li>
+      <li>Swap homogeneous / heterogeneous / attenuating media</li>
+    </ul>
+
+    <h2>Minimal example</h2>
+<pre><code>install_patbox('/path/to/k-Wave')
+
+[p0, sim, info, metrics] = patReconImage('data/Example1.bmp', ...
+    'SensorType', 'linear', ...
+    'TargetSNRdB', 20, ...
+    'Algorithm', 'DMAS');
+
+fprintf('%s | PSNR %.2f dB | SSIM %.3f\n', ...
+    info.algorithm, metrics.psnr, metrics.ssim);</code></pre>
+
+    <h2>Documentation map</h2>
+    <div class="grid grid-2">
+      <div class="panel">
+        <h3>Start here</h3>
+        <p><a href="install.html">Installation</a> · <a href="quickstart.html">Quick start</a> · <a href="examples.html">Examples</a></p>
+      </div>
+      <div class="panel">
+        <h3>Go deeper</h3>
+        <p><a href="architecture.html">Architecture</a> · <a href="simulation.html">Simulation</a> · <a href="modules.html">Modules</a> · <a href="reconstruction.html">Reconstruction</a> · <a href="api.html">API</a> · <a href="configuration.html">Configuration</a> · <a href="faq.html">FAQ</a></p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p><strong>Dependency.</strong> Forward simulation requires
+      <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a>.
+      Documentation structure follows the same Getting Started → modules → API pattern
+      used by packages such as k-Wave and j-Wave, adapted for a MATLAB reconstruction toolbox.</p>
+    </div>
+
+  </main>
+  <footer class="site-footer">
+    <div class="inner">
+      <div>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></div>
+      <div><a href="https://github.com/parsashu/PATBox">github.com/parsashu/PATBox</a></div>
+    </div>
+  </footer>
+  <script src="assets/site.js"></script>
+</body>
+</html>

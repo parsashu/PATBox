@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Install · PATBox</title>
+  <meta name="description" content="Install PATBox and configure k-Wave for MATLAB." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">PATBox <span>v0.6.7-physics-core</span></a>
+      <nav class="nav-links">
+          <a href="index.html">Overview</a>
+          <a href="install.html" class="active">Install</a>
+          <a href="quickstart.html">Quick start</a>
+          <a href="simulation.html">Simulation</a>
+          <a href="modules.html">Modules</a>
+          <a href="reconstruction.html">Reconstruction</a>
+          <a href="architecture.html">Architecture</a>
+          <a href="api.html">API</a>
+          <a href="configuration.html">Configuration</a>
+          <a href="examples.html">Examples</a>
+          <a href="faq.html">FAQ</a>
+          <a class="github-link" href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <button class="nav-toggle" type="button" aria-label="Open menu">Menu</button>
+    </div>
+  </header>
+  <div class="mobile-nav" id="mobile-nav">
+      <a href="index.html">Overview</a>
+      <a href="install.html">Install</a>
+      <a href="quickstart.html">Quick start</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="modules.html">Modules</a>
+      <a href="reconstruction.html">Reconstruction</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="api.html">API</a>
+      <a href="configuration.html">Configuration</a>
+      <a href="examples.html">Examples</a>
+      <a href="faq.html">FAQ</a>
+      <a href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <main>
+
+    <p class="kicker">Setup</p>
+    <h1 class="page-title">Installation</h1>
+    <p class="lead">PATBox runs in MATLAB and uses k-Wave for acoustic wave propagation.</p>
+
+    <h2>Requirements</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Component</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>MATLAB R2019b+</td><td>Declared in <code>info.xml</code></td></tr>
+          <tr><td>Image Processing Toolbox</td><td><code>ssim</code>, <code>mat2gray</code>, image I/O</td></tr>
+          <tr><td><a href="http://www.k-wave.org/">k-Wave</a></td><td>Required for forward simulation</td></tr>
+          <tr><td>GPU (optional)</td><td>Parallel Computing Toolbox + NVIDIA GPU for <code>gpuArray-single</code></td></tr>
+          <tr><td>Signal Processing Toolbox (optional)</td><td>Only if <code>bandpass_filter=true</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>1. Clone the repository</h2>
+<pre><code>git clone https://github.com/parsashu/PATBox.git
+cd PATBox</code></pre>
+
+    <h2>2. Add PATBox to the MATLAB path</h2>
+<pre><code>addpath('/absolute/path/to/PATBox')</code></pre>
+
+    <h2>3. Configure k-Wave</h2>
+<pre><code>install_patbox('/absolute/path/to/k-Wave')</code></pre>
+    <p>This will:</p>
+    <ul>
+      <li>Add PATBox folders: <code>recon</code>, <code>simulation</code>, <code>physics</code>, <code>geometry</code>, <code>noise</code>, <code>utils</code></li>
+      <li>Add k-Wave to the MATLAB path</li>
+      <li>Write <code>kwave_path.txt</code> in the package root</li>
+      <li>Append a <code>% PATBox auto-load</code> block to MATLAB <code>startup.m</code></li>
+    </ul>
+    <div class="callout">
+      <p>After the first successful install, <strong>new MATLAB sessions load PATBox automatically</strong>.</p>
+    </div>
+
+    <h2>4. Verify</h2>
+<pre><code>which patSimulate
+which kspaceFirstOrder2D
+patVersion
+patListAlgorithms</code></pre>
+
+    <h2>Running examples</h2>
+<pre><code>cd('/absolute/path/to/PATBox/examples')
+reconstruct_image</code></pre>
+
+    <h2>Troubleshooting</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Symptom</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td><code>Undefined function 'patSimulate'</code></td><td>Run <code>addpath</code> then <code>install_patbox</code></td></tr>
+          <tr><td><code>Undefined function 'kspaceFirstOrder2D'</code></td><td>Pass a valid k-Wave folder to <code>install_patbox</code></td></tr>
+          <tr><td>GPU warnings</td><td>PATBox falls back to CPU <code>single</code> when no usable GPU is found</td></tr>
+          <tr><td>Stale YAML values</td><td>Run <code>clear functions</code> after editing <code>params.yaml</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+  <footer class="site-footer">
+    <div class="inner">
+      <div>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></div>
+      <div><a href="https://github.com/parsashu/PATBox">github.com/parsashu/PATBox</a></div>
+    </div>
+  </footer>
+  <script src="assets/site.js"></script>
+</body>
+</html>

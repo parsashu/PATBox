@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quick start · PATBox</title>
+  <meta name="description" content="Run your first PATBox simulation and reconstruction." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">PATBox <span>v0.6.7-physics-core</span></a>
+      <nav class="nav-links">
+          <a href="index.html">Overview</a>
+          <a href="install.html">Install</a>
+          <a href="quickstart.html" class="active">Quick start</a>
+          <a href="simulation.html">Simulation</a>
+          <a href="modules.html">Modules</a>
+          <a href="reconstruction.html">Reconstruction</a>
+          <a href="architecture.html">Architecture</a>
+          <a href="api.html">API</a>
+          <a href="configuration.html">Configuration</a>
+          <a href="examples.html">Examples</a>
+          <a href="faq.html">FAQ</a>
+          <a class="github-link" href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <button class="nav-toggle" type="button" aria-label="Open menu">Menu</button>
+    </div>
+  </header>
+  <div class="mobile-nav" id="mobile-nav">
+      <a href="index.html">Overview</a>
+      <a href="install.html">Install</a>
+      <a href="quickstart.html">Quick start</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="modules.html">Modules</a>
+      <a href="reconstruction.html">Reconstruction</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="api.html">API</a>
+      <a href="configuration.html">Configuration</a>
+      <a href="examples.html">Examples</a>
+      <a href="faq.html">FAQ</a>
+      <a href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <main>
+
+    <p class="kicker">Usage</p>
+    <h1 class="page-title">Quick start</h1>
+    <p class="lead">Three ways to use PATBox: one-shot API, step-by-step pipeline, or YAML-driven examples.</p>
+
+    <h2>1. One-shot: patReconImage</h2>
+<pre><code>[p0_recon, sim, info, metrics] = patReconImage('data/Example1.bmp', ...
+    'SensorType', 'circular', ...
+    'TargetSNRdB', 20, ...
+    'Algorithm', 'DMAS');
+
+disp(info)
+disp(metrics)</code></pre>
+
+    <h2>2. Step-by-step pipeline</h2>
+<pre><code>img = fullfile(fileparts(which('patSimulate')), 'data', 'Example1.bmp');
+
+sim = patSimulate(img, 'SensorType', 'linear', 'TargetSNRdB', 20);
+[p0_recon, info] = patReconstruct(sim, 'DS-DMAS');
+metrics = patEvaluate(p0_recon, sim.p0_reference);</code></pre>
+
+    <h2>3. Prefer the sim struct</h2>
+    <p>Use the single-struct output whenever possible. It carries medium maps, ordered element geometry, clean/system/measured RF, and provenance metadata.</p>
+<pre><code>sim = patSimulate(img);           % preferred
+[p0, info] = patReconstruct(sim, 'UBP');</code></pre>
+
+    <h2>4. Override parameters</h2>
+<pre><code>sim = patSimulate(img, ...
+    'SensorType', 'arc', ...
+    'SensorArcDeg', 120, ...
+    'MediumModel', 'gaussian', ...
+    'NoiseModel', 'awgn', ...
+    'TargetSNRdB', 15, ...
+    'GridSize', 256);
+
+[p0, info] = patReconstruct(sim, 'ITERATIVE-TR', ...
+    'NumIterations', 8, ...
+    'StepSize', 0.2);</code></pre>
+
+    <h2>5. Load saved sensor data</h2>
+<pre><code>sim = patSimulate([], ...
+    'UseSimulation', false, ...
+    'SensorDataPath', 'path/to/sim.mat');
+[p0, info] = patReconstruct(sim, 'DAS');</code></pre>
+
+    <div class="callout">
+      <p><strong>Noise tip.</strong> Prefer <code>TargetSNRdB</code> with <code>NoiseModel</code>. Legacy <code>NoiseLevel</code> exists only for old scripts.</p>
+    </div>
+
+  </main>
+  <footer class="site-footer">
+    <div class="inner">
+      <div>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></div>
+      <div><a href="https://github.com/parsashu/PATBox">github.com/parsashu/PATBox</a></div>
+    </div>
+  </footer>
+  <script src="assets/site.js"></script>
+</body>
+</html>
