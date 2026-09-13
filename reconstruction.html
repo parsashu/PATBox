@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reconstruction · PATBox</title>
+  <meta name="description" content="PATBox reconstruction algorithms and shared options." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">PATBox <span>v0.6.7-physics-core</span></a>
+      <nav class="nav-links">
+          <a href="index.html">Overview</a>
+          <a href="install.html">Install</a>
+          <a href="quickstart.html">Quick start</a>
+          <a href="simulation.html">Simulation</a>
+          <a href="modules.html">Modules</a>
+          <a href="reconstruction.html" class="active">Reconstruction</a>
+          <a href="architecture.html">Architecture</a>
+          <a href="api.html">API</a>
+          <a href="configuration.html">Configuration</a>
+          <a href="examples.html">Examples</a>
+          <a href="faq.html">FAQ</a>
+          <a class="github-link" href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <button class="nav-toggle" type="button" aria-label="Open menu">Menu</button>
+    </div>
+  </header>
+  <div class="mobile-nav" id="mobile-nav">
+      <a href="index.html">Overview</a>
+      <a href="install.html">Install</a>
+      <a href="quickstart.html">Quick start</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="modules.html">Modules</a>
+      <a href="reconstruction.html">Reconstruction</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="api.html">API</a>
+      <a href="configuration.html">Configuration</a>
+      <a href="examples.html">Examples</a>
+      <a href="faq.html">FAQ</a>
+      <a href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <main>
+
+    <p class="kicker">Algorithms</p>
+    <h1 class="page-title">Reconstruction</h1>
+    <p class="lead">All algorithms are dispatched by <code>patReconstruct</code> through <code>getReconFunction</code>.</p>
+
+    <h2>Supported names</h2>
+<pre><code>patListAlgorithms
+% DAS, CF-DAS, DMAS, DS-DMAS, MV-DAS, VDAS, SCF-DAS, CFMV-DAS,
+% FBP, UBP, DMAS-UBP, VDAS-UBP, TR, ITERATIVE-DAS, ITERATIVE-TR</code></pre>
+
+    <h2>Algorithm reference</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>File</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>DAS</code></td><td><code>recon/das.m</code></td><td>Delay-and-sum with subsample ToF interpolation</td></tr>
+          <tr><td><code>CF-DAS</code></td><td><code>recon/cfdas.m</code></td><td>Coherence-factor–weighted DAS</td></tr>
+          <tr><td><code>DMAS</code></td><td><code>recon/dmas.m</code></td><td>Delay-multiply-and-sum (nonlinear)</td></tr>
+          <tr><td><code>DS-DMAS</code></td><td><code>recon/ds_dmas.m</code></td><td>Dual-stage DAS within subarrays, DMAS across them</td></tr>
+          <tr><td><code>MV-DAS</code></td><td><code>recon/mv_das.m</code></td><td>Minimum-variance / Capon adaptive beamforming</td></tr>
+          <tr><td><code>VDAS</code></td><td><code>recon/vdas.m</code></td><td>Variance-weighted DAS</td></tr>
+          <tr><td><code>SCF-DAS</code></td><td><code>recon/scf_das.m</code></td><td>Sign-coherence-factor–weighted DAS</td></tr>
+          <tr><td><code>CFMV-DAS</code></td><td><code>recon/cfmv_das.m</code></td><td>Coherence × MV hybrid</td></tr>
+          <tr><td><code>FBP</code></td><td><code>recon/fbp.m</code></td><td>Filtered back-projection (Ram-Lak)</td></tr>
+          <tr><td><code>UBP</code></td><td><code>recon/ubp.m</code></td><td>Xu–Wang universal back-projection</td></tr>
+          <tr><td><code>DMAS-UBP</code></td><td><code>recon/dmas_ubp.m</code></td><td>UBP preprocessing + DMAS</td></tr>
+          <tr><td><code>VDAS-UBP</code></td><td><code>recon/vdas_ubp.m</code></td><td>UBP preprocessing + variance-weighted DAS</td></tr>
+          <tr><td><code>TR</code></td><td><code>recon/time_reversal.m</code></td><td>k-Wave time reversal</td></tr>
+          <tr><td><code>ITERATIVE-DAS</code></td><td><code>recon/iterative.m</code></td><td>Iterative updates with DAS adjoint-like steps</td></tr>
+          <tr><td><code>ITERATIVE-TR</code></td><td><code>recon/iterative.m</code></td><td>Iterative updates with time-reversal steps</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Shared options</h2>
+    <ul>
+      <li><code>envelope_signal</code> — Hilbert envelope after reconstruction</li>
+      <li><code>remove_negatives</code> — zero negative pressures</li>
+      <li><code>bandpass_filter</code>, <code>frequency_low</code>, <code>frequency_high</code></li>
+      <li><code>interp_method</code> — <code>nearest</code> | <code>linear</code> | <code>cubic</code></li>
+    </ul>
+
+    <h2>Algorithm-specific knobs</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Algorithm</th><th>Options</th></tr></thead>
+        <tbody>
+          <tr><td>DS-DMAS</td><td><code>num_subarrays</code></td></tr>
+          <tr><td>MV-DAS / CFMV-DAS</td><td><code>dl_factor</code></td></tr>
+          <tr><td>VDAS / VDAS-UBP</td><td><code>k_power</code></td></tr>
+          <tr><td>SCF-DAS</td><td><code>scf_power</code></td></tr>
+          <tr><td>ITERATIVE-*</td><td><code>InitialGuess</code>, <code>NumIterations</code>, <code>StepSize</code>, <code>UpdateMethod</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Geometry compatibility</h2>
+    <p>
+      Physics-aware simulations return ordered physical-element traces.
+      Current beamformers locate receivers with <code>find(mask)</code>.
+      <code>patReconstruct</code> uses <code>legacyCompatibleSensorInputs</code> to snap element centres
+      to the grid and reorder channels so legacy engines remain usable.
+      UBP-family algorithms keep the geometry struct when needed.
+    </p>
+
+    <h2>Saving outputs</h2>
+<pre><code>[p0, info] = patReconstruct(sim, 'DMAS', ...
+    'SaveOutput', true, ...
+    'SaveMat', true, ...
+    'SavePng', true, ...
+    'OutputDir', 'output/recon');</code></pre>
+
+    <h2>Evaluation metrics</h2>
+    <p><code>patEvaluate</code> compares a reconstruction to <code>sim.p0_reference</code> (or any ground-truth map):</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>mse</code> / <code>rmse</code></td><td>Mean / root-mean-square error (after <code>mat2gray</code>)</td></tr>
+          <tr><td><code>psnr</code></td><td>Peak signal-to-noise ratio (dB)</td></tr>
+          <tr><td><code>ssim</code></td><td>Structural similarity</td></tr>
+          <tr><td><code>snr</code></td><td>Signal energy vs error energy (dB)</td></tr>
+          <tr><td><code>sharpness</code></td><td>Mean gradient magnitude</td></tr>
+          <tr><td><code>uiqi</code></td><td>Universal image quality index</td></tr>
+          <tr><td><code>cnr</code></td><td>Contrast-to-noise ratio</td></tr>
+          <tr><td><code>sbr</code></td><td>Signal-to-background ratio</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+  <footer class="site-footer">
+    <div class="inner">
+      <div>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></div>
+      <div><a href="https://github.com/parsashu/PATBox">github.com/parsashu/PATBox</a></div>
+    </div>
+  </footer>
+  <script src="assets/site.js"></script>
+</body>
+</html>

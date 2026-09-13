@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Examples · PATBox</title>
+  <meta name="description" content="PATBox example scripts and how to run them." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">PATBox <span>v0.6.7-physics-core</span></a>
+      <nav class="nav-links">
+          <a href="index.html">Overview</a>
+          <a href="install.html">Install</a>
+          <a href="quickstart.html">Quick start</a>
+          <a href="simulation.html">Simulation</a>
+          <a href="modules.html">Modules</a>
+          <a href="reconstruction.html">Reconstruction</a>
+          <a href="architecture.html">Architecture</a>
+          <a href="api.html">API</a>
+          <a href="configuration.html">Configuration</a>
+          <a href="examples.html" class="active">Examples</a>
+          <a href="faq.html">FAQ</a>
+          <a class="github-link" href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <button class="nav-toggle" type="button" aria-label="Open menu">Menu</button>
+    </div>
+  </header>
+  <div class="mobile-nav" id="mobile-nav">
+      <a href="index.html">Overview</a>
+      <a href="install.html">Install</a>
+      <a href="quickstart.html">Quick start</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="modules.html">Modules</a>
+      <a href="reconstruction.html">Reconstruction</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="api.html">API</a>
+      <a href="configuration.html">Configuration</a>
+      <a href="examples.html">Examples</a>
+      <a href="faq.html">FAQ</a>
+      <a href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <main>
+
+    <p class="kicker">Scripts</p>
+    <h1 class="page-title">Examples</h1>
+    <p class="lead">Example scripts live in <code>examples/</code> and read defaults from <code>params.yaml</code>.</p>
+
+    <h2>reconstruct_image.m</h2>
+    <p>Minimal end-to-end demo: simulate → reconstruct (default algorithm) → evaluate → side-by-side figure.</p>
+<pre><code>cd('/path/to/PATBox/examples')
+reconstruct_image</code></pre>
+
+    <h2>multi_reconstructions.m</h2>
+    <p>One forward simulation, then a loop over <code>multi_reconstruction.Algorithms</code>. Optionally saves comparison figures and MAT files under <code>output/recon</code>.</p>
+<pre><code>multi_reconstructions</code></pre>
+
+    <h2>benchmark_algorithms.m</h2>
+    <p>Runs all algorithms listed under <code>benchmark_algorithms</code> on one shared simulation, builds a metrics table, renders a figure, and optionally writes CSV.</p>
+<pre><code>benchmark_algorithms</code></pre>
+
+    <h2>Sample data</h2>
+    <ul>
+      <li><code>data/Example1.bmp</code></li>
+      <li><code>data/Example2.bmp</code></li>
+      <li><code>data/Example3.bmp</code></li>
+    </ul>
+    <p>Change <code>simulation.ImagePath</code> in <code>params.yaml</code> to switch phantoms.</p>
+
+    <h2>Typical workflow</h2>
+    <ol>
+      <li>Edit <code>params.yaml</code> (sensor, noise, algorithm list)</li>
+      <li>Run an example script</li>
+      <li>Inspect printed metrics and files under <code>output/</code></li>
+    </ol>
+
+  </main>
+  <footer class="site-footer">
+    <div class="inner">
+      <div>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></div>
+      <div><a href="https://github.com/parsashu/PATBox">github.com/parsashu/PATBox</a></div>
+    </div>
+  </footer>
+  <script src="assets/site.js"></script>
+</body>
+</html>

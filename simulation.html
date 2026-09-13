@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simulation · PATBox</title>
+  <meta name="description" content="PATBox forward simulation modules, sensor types, media, and acquisition model." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">PATBox <span>v0.6.7-physics-core</span></a>
+      <nav class="nav-links">
+          <a href="index.html">Overview</a>
+          <a href="install.html">Install</a>
+          <a href="quickstart.html">Quick start</a>
+          <a href="simulation.html" class="active">Simulation</a>
+          <a href="modules.html">Modules</a>
+          <a href="reconstruction.html">Reconstruction</a>
+          <a href="architecture.html">Architecture</a>
+          <a href="api.html">API</a>
+          <a href="configuration.html">Configuration</a>
+          <a href="examples.html">Examples</a>
+          <a href="faq.html">FAQ</a>
+          <a class="github-link" href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <button class="nav-toggle" type="button" aria-label="Open menu">Menu</button>
+    </div>
+  </header>
+  <div class="mobile-nav" id="mobile-nav">
+      <a href="index.html">Overview</a>
+      <a href="install.html">Install</a>
+      <a href="quickstart.html">Quick start</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="modules.html">Modules</a>
+      <a href="reconstruction.html">Reconstruction</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="api.html">API</a>
+      <a href="configuration.html">Configuration</a>
+      <a href="examples.html">Examples</a>
+      <a href="faq.html">FAQ</a>
+      <a href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <main>
+
+    <p class="kicker">Modules</p>
+    <h1 class="page-title">Simulation</h1>
+    <p class="lead">Forward modeling is centered on <code>forward_simulation_physical</code>, called by <code>patSimulate</code>.</p>
+
+    <h2>Pipeline</h2>
+    <ol>
+      <li>Design grid (<code>GridSize</code>, <code>Dx/Dy</code> or points-per-wavelength)</li>
+      <li>Build acoustic medium (<code>buildAcousticMedium2D</code>)</li>
+      <li>Place sensors (<code>buildSensorGeometry2D</code>)</li>
+      <li>Build initial pressure (<code>buildInitialPressure2D</code>)</li>
+      <li>Run <code>kspaceFirstOrder2D</code></li>
+      <li>Combine simulation points into physical-element traces</li>
+      <li>Apply acquisition model (<code>applyAcquisitionModel</code>)</li>
+    </ol>
+
+    <h2>Module map</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Module</th><th>File</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td>Physical core</td><td><code>simulation/forward_simulation_physical.m</code></td><td>End-to-end 2-D PAT acquisition</td></tr>
+          <tr><td>Medium</td><td><code>physics/buildAcousticMedium2D.m</code></td><td>Homogeneous / Gaussian / MAT / segmented media</td></tr>
+          <tr><td>Source</td><td><code>physics/buildInitialPressure2D.m</code></td><td>Image, MAT, or absorption×fluence sources</td></tr>
+          <tr><td>Geometry</td><td><code>geometry/buildSensorGeometry2D.m</code></td><td>Ordered physical elements + kWaveArray support</td></tr>
+          <tr><td>Acquisition</td><td><code>noise/applyAcquisitionModel.m</code></td><td>System impairments + noise models</td></tr>
+          <tr><td>Legacy wrappers</td><td><code>forward_simulation_linear/square/circular.m</code></td><td>Deprecated APIs routed through the physical core</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Sensor types</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>SensorType</th><th>Description</th><th>Key options</th></tr></thead>
+        <tbody>
+          <tr><td><code>linear</code></td><td>Linear array (default near xmin + margin)</td><td><code>NumTransducers</code>, <code>Pitch</code>, <code>Kerf</code>, <code>ElementWidth</code></td></tr>
+          <tr><td><code>square</code></td><td>Square aperture around the FOV</td><td><code>NumTransducers</code>, <code>SensorMargin</code></td></tr>
+          <tr><td><code>circular</code></td><td>Closed circular array</td><td><code>SensorRadius</code>, <code>NumTransducers</code></td></tr>
+          <tr><td><code>arc</code></td><td>Limited-view arc</td><td><code>SensorArcDeg</code>, <code>SensorStartAngleDeg</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Sensor models</h2>
+    <p><code>SensorModel</code>: <code>auto</code> | <code>kwave_array</code> | <code>rasterized</code> | <code>point</code> | <code>cartesian_point</code></p>
+    <p><code>auto</code> selects <code>kWaveArray</code> when available, otherwise rasterized finite elements.</p>
+
+    <h2>Media</h2>
+    <ul>
+      <li><code>homogeneous</code> — constant sound speed / density</li>
+      <li><code>gaussian</code> — correlated random heterogeneity (<code>SoundSpeedStd</code>, <code>DensityStd</code>, <code>CorrelationLength</code>)</li>
+      <li><code>mat</code> / <code>segmented</code> — load maps from file</li>
+    </ul>
+    <p>Attenuation uses <code>AlphaCoeff</code>, <code>AlphaPower</code>, and <code>AlphaMode</code> (<code>full</code>, <code>no_dispersion</code>, <code>no_absorption</code>). k-Wave rejects <code>AlphaPower = 1</code> with full dispersion — use <code>no_dispersion</code> for that case.</p>
+
+    <h2>Initial pressure sources</h2>
+    <ul>
+      <li><code>normalized_image</code> — BMP/PNG scaled by <code>P0Scale</code> (default convenience mode)</li>
+      <li><code>initial_pressure_mat</code> — load a numeric map from a MAT file</li>
+      <li><code>absorption_fluence</code> — build \(p_0\) from absorption and fluence maps</li>
+    </ul>
+
+    <h2>Acquisition / noise</h2>
+    <p><code>NoiseModel</code>: <code>none</code> | <code>awgn</code> | <code>colored</code> | <code>measured</code> | <code>hybrid</code></p>
+    <p>Prefer <code>TargetSNRdB</code>. Additional knobs include channel gain, time/trigger jitter, crosstalk, dead channels, interference tones, and ADC bit depth.</p>
+
+    <h2>Returned sim struct</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>sensor_data</code></td><td>Measured RF (<code>.p</code>), physical elements × time</td></tr>
+          <tr><td><code>sensor_data_clean</code></td><td>Ideal element traces before acquisition model</td></tr>
+          <tr><td><code>sensor_data_system</code></td><td>System-impaired traces before additive noise</td></tr>
+          <tr><td><code>sensor</code> / <code>sensor_geometry</code></td><td>Ordered element geometry used for reconstruction</td></tr>
+          <tr><td><code>kgrid</code>, <code>source</code>, <code>medium</code></td><td>k-Wave objects / maps</td></tr>
+          <tr><td><code>p0_reference</code></td><td>Ground-truth initial pressure</td></tr>
+          <tr><td><code>info</code></td><td>Provenance, aperture audit, acquisition metadata</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+  <footer class="site-footer">
+    <div class="inner">
+      <div>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></div>
+      <div><a href="https://github.com/parsashu/PATBox">github.com/parsashu/PATBox</a></div>
+    </div>
+  </footer>
+  <script src="assets/site.js"></script>
+</body>
+</html>

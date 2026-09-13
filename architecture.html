@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Architecture · PATBox</title>
+  <meta name="description" content="PATBox package layout and module responsibilities." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">PATBox <span>v0.6.7-physics-core</span></a>
+      <nav class="nav-links">
+          <a href="index.html">Overview</a>
+          <a href="install.html">Install</a>
+          <a href="quickstart.html">Quick start</a>
+          <a href="simulation.html">Simulation</a>
+          <a href="modules.html">Modules</a>
+          <a href="reconstruction.html">Reconstruction</a>
+          <a href="architecture.html" class="active">Architecture</a>
+          <a href="api.html">API</a>
+          <a href="configuration.html">Configuration</a>
+          <a href="examples.html">Examples</a>
+          <a href="faq.html">FAQ</a>
+          <a class="github-link" href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <button class="nav-toggle" type="button" aria-label="Open menu">Menu</button>
+    </div>
+  </header>
+  <div class="mobile-nav" id="mobile-nav">
+      <a href="index.html">Overview</a>
+      <a href="install.html">Install</a>
+      <a href="quickstart.html">Quick start</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="modules.html">Modules</a>
+      <a href="reconstruction.html">Reconstruction</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="api.html">API</a>
+      <a href="configuration.html">Configuration</a>
+      <a href="examples.html">Examples</a>
+      <a href="faq.html">FAQ</a>
+      <a href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <main>
+
+    <p class="kicker">Design</p>
+    <h1 class="page-title">Architecture</h1>
+    <p class="lead">PATBox is organized so public APIs stay thin while physics, geometry, noise, and reconstruction remain modular.</p>
+
+    <h2>Package layout</h2>
+<pre><code>PATBox/
+  install_patbox.m
+  patSimulate.m / patReconstruct.m / patReconImage.m
+  patEvaluate.m / patListAlgorithms.m / patVersion.m
+  params.yaml
+  recon/           reconstruction engines
+  simulation/      physical core + legacy wrappers
+  physics/         medium + initial pressure
+  geometry/        sensor arrays
+  noise/           acquisition model
+  utils/           YAML, I/O, helpers
+  examples/
+  data/
+  docs/            this site</code></pre>
+
+    <h2>Call graph (forward + recon)</h2>
+<pre><code>patReconImage
+  └─ patSimulate
+       └─ forward_simulation_physical
+            ├─ buildAcousticMedium2D
+            ├─ buildSensorGeometry2D
+            ├─ buildInitialPressure2D
+            ├─ kspaceFirstOrder2D   (k-Wave)
+            └─ applyAcquisitionModel
+  └─ patReconstruct
+       ├─ legacyCompatibleSensorInputs
+       ├─ getReconFunction → recon/*.m
+       └─ saveReconOutput (optional)
+  └─ patEvaluate</code></pre>
+
+    <h2>Design principles</h2>
+    <ul>
+      <li><strong>Single sim struct</strong> carries everything reconstruction and evaluation need</li>
+      <li><strong>YAML defaults</strong> keep scripts short; overrides are name-value pairs</li>
+      <li><strong>Physical elements first</strong>: RF is always channels × time after combining</li>
+      <li><strong>Auditable acquisition</strong>: ideal, system-impaired, and measured data are stored separately</li>
+      <li><strong>Legacy bridges</strong>: old multi-output APIs and mask-based recon still work</li>
+    </ul>
+
+    <h2>Utility modules</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Utility</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><code>loadPatboxYaml</code></td><td>Parse/merge <code>params.yaml</code></td></tr>
+          <tr><td><code>simParameters</code> / <code>reconParameters</code></td><td>Section accessors</td></tr>
+          <tr><td><code>loadSimulation</code></td><td>Load preferred <code>sim</code> MAT files</td></tr>
+          <tr><td><code>resolvePatboxPath</code></td><td>Resolve paths relative to package root</td></tr>
+          <tr><td><code>applySensorBandpassFilter</code></td><td>Butterworth bandpass on RF</td></tr>
+          <tr><td><code>finalizeReconImage</code></td><td>Envelope / remove negatives</td></tr>
+          <tr><td><code>renderAlgorithmTable</code></td><td>Benchmark table figure</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+  <footer class="site-footer">
+    <div class="inner">
+      <div>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></div>
+      <div><a href="https://github.com/parsashu/PATBox">github.com/parsashu/PATBox</a></div>
+    </div>
+  </footer>
+  <script src="assets/site.js"></script>
+</body>
+</html>

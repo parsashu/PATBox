@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FAQ · PATBox</title>
+  <meta name="description" content="PATBox troubleshooting and common questions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">PATBox <span>v0.6.7-physics-core</span></a>
+      <nav class="nav-links">
+          <a href="index.html">Overview</a>
+          <a href="install.html">Install</a>
+          <a href="quickstart.html">Quick start</a>
+          <a href="simulation.html">Simulation</a>
+          <a href="modules.html">Modules</a>
+          <a href="reconstruction.html">Reconstruction</a>
+          <a href="architecture.html">Architecture</a>
+          <a href="api.html">API</a>
+          <a href="configuration.html">Configuration</a>
+          <a href="examples.html">Examples</a>
+          <a href="faq.html" class="active">FAQ</a>
+          <a class="github-link" href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <button class="nav-toggle" type="button" aria-label="Open menu">Menu</button>
+    </div>
+  </header>
+  <div class="mobile-nav" id="mobile-nav">
+      <a href="index.html">Overview</a>
+      <a href="install.html">Install</a>
+      <a href="quickstart.html">Quick start</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="modules.html">Modules</a>
+      <a href="reconstruction.html">Reconstruction</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="api.html">API</a>
+      <a href="configuration.html">Configuration</a>
+      <a href="examples.html">Examples</a>
+      <a href="faq.html">FAQ</a>
+      <a href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <main>
+
+    <p class="kicker">Help</p>
+    <h1 class="page-title">FAQ</h1>
+    <p class="lead">Common setup, simulation, and reconstruction questions.</p>
+
+    <h2>k-Wave is not found</h2>
+    <p>Pass an absolute path to the k-Wave root (the folder that contains <code>kspaceFirstOrder2D.m</code>):</p>
+<pre><code>install_patbox('/absolute/path/to/k-Wave')
+which kspaceFirstOrder2D</code></pre>
+
+    <h2>GPU falls back to CPU</h2>
+    <p>If no usable NVIDIA GPU / Parallel Computing Toolbox is available, PATBox uses CPU <code>single</code>. Set <code>DataCast: single</code> in YAML to silence GPU attempts.</p>
+
+    <h2>AlphaPower = 1 with attenuation</h2>
+    <p>k-Wave rejects <code>AlphaPower = 1</code> with full dispersion. Use <code>AlphaMode: no_dispersion</code> when you need that power-law exponent.</p>
+
+    <h2>YAML changes are ignored</h2>
+<pre><code>clear functions
+simParameters()</code></pre>
+
+    <h2>Which pressure reference for metrics?</h2>
+<pre><code>metrics = patEvaluate(p0_recon, sim.p0_reference);</code></pre>
+
+    <h2>Limited-view imaging</h2>
+<pre><code>sim = patSimulate(img, 'SensorType', 'arc', 'SensorArcDeg', 120);</code></pre>
+
+    <h2>Load experimental / saved RF</h2>
+<pre><code>sim = patSimulate([], 'UseSimulation', false, 'SensorDataPath', 'path/to/sim.mat');
+[p0, info] = patReconstruct(sim, 'UBP');</code></pre>
+    <p>Prefer a MAT file that stores the full <code>sim</code> struct. Legacy field layouts are still accepted by <code>loadSimulation</code>.</p>
+
+    <h2>How does this relate to k-Wave / j-Wave?</h2>
+    <p>
+      PATBox uses k-Wave for wave propagation (same role j-Wave plays in the JAX ecosystem).
+      Documentation follows the same Getting Started → modules → API pattern:
+      install, run a minimal IVP-style example, then dive into medium / sensor / acquisition modules.
+    </p>
+
+  </main>
+  <footer class="site-footer">
+    <div class="inner">
+      <div>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></div>
+      <div><a href="https://github.com/parsashu/PATBox">github.com/parsashu/PATBox</a></div>
+    </div>
+  </footer>
+  <script src="assets/site.js"></script>
+</body>
+</html>

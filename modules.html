@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Modules · PATBox</title>
+  <meta name="description" content="Detailed explanation of PATBox physics, geometry, noise, simulation, and util modules." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">PATBox <span>v0.6.7-physics-core</span></a>
+      <nav class="nav-links">
+          <a href="index.html">Overview</a>
+          <a href="install.html">Install</a>
+          <a href="quickstart.html">Quick start</a>
+          <a href="simulation.html">Simulation</a>
+          <a href="modules.html" class="active">Modules</a>
+          <a href="reconstruction.html">Reconstruction</a>
+          <a href="architecture.html">Architecture</a>
+          <a href="api.html">API</a>
+          <a href="configuration.html">Configuration</a>
+          <a href="examples.html">Examples</a>
+          <a href="faq.html">FAQ</a>
+          <a class="github-link" href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <button class="nav-toggle" type="button" aria-label="Open menu">Menu</button>
+    </div>
+  </header>
+  <div class="mobile-nav" id="mobile-nav">
+      <a href="index.html">Overview</a>
+      <a href="install.html">Install</a>
+      <a href="quickstart.html">Quick start</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="modules.html">Modules</a>
+      <a href="reconstruction.html">Reconstruction</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="api.html">API</a>
+      <a href="configuration.html">Configuration</a>
+      <a href="examples.html">Examples</a>
+      <a href="faq.html">FAQ</a>
+      <a href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <main>
+
+    <p class="kicker">Code map</p>
+    <h1 class="page-title">Modules</h1>
+    <p class="lead">Each folder is a self-contained concern. Public scripts stay thin; modules own the physics.</p>
+
+    <nav class="toc">
+      <a href="#simulation-core">Simulation core</a>
+      <a href="#physics">physics/</a>
+      <a href="#geometry">geometry/</a>
+      <a href="#noise">noise/</a>
+      <a href="#recon">recon/</a>
+      <a href="#utils">utils/</a>
+    </nav>
+
+    <h2 id="simulation-core">Simulation core</h2>
+    <div class="panel">
+      <h3>forward_simulation_physical.m</h3>
+      <p>End-to-end 2-D PAT acquisition. Builds the grid, medium, sensors, and initial pressure; runs <code>kspaceFirstOrder2D</code>; combines integration points into physical-element RF; applies the acquisition model; packages the <code>sim</code> struct.</p>
+    </div>
+    <div class="panel">
+      <h3>Legacy wrappers</h3>
+      <p><code>forward_simulation_linear.m</code>, <code>forward_simulation_square.m</code>, <code>forward_simulation_circular.m</code> remain for old scripts. They route through <code>forward_simulation_legacy_adapter.m</code> into the physical core. Prefer <code>patSimulate</code>.</p>
+    </div>
+
+    <h2 id="physics">physics/</h2>
+    <div class="panel">
+      <h3>buildAcousticMedium2D</h3>
+      <p>Builds validated sound-speed / density maps for k-Wave.</p>
+      <ul>
+        <li><code>homogeneous</code> — scalar properties</li>
+        <li><code>gaussian</code> — correlated random heterogeneity</li>
+        <li><code>mat</code> — load maps from a MAT file</li>
+        <li><code>segmented</code> — label map + tissue property table</li>
+      </ul>
+      <p>Attenuation uses k-Wave units <code>dB/(MHz^α · cm)</code>. Optional coupling layers can be attached to a domain edge.</p>
+    </div>
+    <div class="panel">
+      <h3>buildInitialPressure2D</h3>
+      <p>Creates the initial-pressure field from a normalized image, a MAT map, or absorption × fluence × Grüneisen.</p>
+    </div>
+
+    <h2 id="geometry">geometry/</h2>
+    <div class="panel">
+      <h3>buildSensorGeometry2D</h3>
+      <p>Builds ordered physical receivers. <code>NumTransducers</code> is always the total element count. Element order is stored in <code>geom.positions</code> and must be preserved for reconstruction.</p>
+      <p><code>SensorModel</code> selects how finite elements are represented:</p>
+      <ul>
+        <li><code>auto</code> — <code>kWaveArray</code> when available, else rasterized</li>
+        <li><code>kwave_array</code> — off-grid line elements (recommended)</li>
+        <li><code>rasterized</code> — explicit on-grid integration points</li>
+        <li><code>point</code> / <code>cartesian_point</code> — one point per element</li>
+      </ul>
+    </div>
+
+    <h2 id="noise">noise/</h2>
+    <div class="panel">
+      <h3>applyAcquisitionModel</h3>
+      <p>Receive-chain model on <code>[channels × time]</code> data. Separates:</p>
+      <ul>
+        <li><strong>clean</strong> — ideal integrated element pressure</li>
+        <li><strong>system</strong> — gain, jitter, crosstalk, dead channels, interference</li>
+        <li><strong>measured</strong> — after additive noise / ADC</li>
+      </ul>
+      <p>Noise models: <code>none</code>, <code>awgn</code>, <code>colored</code>, <code>measured</code>, <code>hybrid</code>. Prefer <code>TargetSNRdB</code>.</p>
+    </div>
+
+    <h2 id="recon">recon/</h2>
+    <p>One file per algorithm (or shared iterative engine). Selected through <code>getReconFunction</code>. See <a href="reconstruction.html">Reconstruction</a>.</p>
+
+    <h2 id="utils">utils/</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Helper</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td><code>loadPatboxYaml</code></td><td>Parse <code>params.yaml</code> (inline comments supported)</td></tr>
+          <tr><td><code>simParameters</code> / <code>reconParameters</code></td><td>Section accessors</td></tr>
+          <tr><td><code>benchmarkParameters</code> / <code>multiReconParameters</code></td><td>Example script configs</td></tr>
+          <tr><td><code>loadSimulation</code></td><td>Load preferred <code>sim</code> MAT files</td></tr>
+          <tr><td><code>legacyCompatibleSensorInputs</code></td><td>Bridge physical elements → mask-based recon</td></tr>
+          <tr><td><code>resolveSensorElementGeometry</code></td><td>Calibrated vs nominal geometry</td></tr>
+          <tr><td><code>applySensorBandpassFilter</code></td><td>Optional RF bandpass</td></tr>
+          <tr><td><code>finalizeReconImage</code></td><td>Envelope / remove negatives</td></tr>
+          <tr><td><code>saveReconOutput</code></td><td>MAT / PNG writers</td></tr>
+          <tr><td><code>renderAlgorithmTable</code></td><td>Benchmark table figure</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+  <footer class="site-footer">
+    <div class="inner">
+      <div>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></div>
+      <div><a href="https://github.com/parsashu/PATBox">github.com/parsashu/PATBox</a></div>
+    </div>
+  </footer>
+  <script src="assets/site.js"></script>
+</body>
+</html>

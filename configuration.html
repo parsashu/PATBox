@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Configuration · PATBox</title>
+  <meta name="description" content="Complete PATBox params.yaml reference for simulation and reconstruction." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">PATBox <span>v0.6.7-physics-core</span></a>
+      <nav class="nav-links">
+          <a href="index.html">Overview</a>
+          <a href="install.html">Install</a>
+          <a href="quickstart.html">Quick start</a>
+          <a href="simulation.html">Simulation</a>
+          <a href="modules.html">Modules</a>
+          <a href="reconstruction.html">Reconstruction</a>
+          <a href="architecture.html">Architecture</a>
+          <a href="api.html">API</a>
+          <a href="configuration.html" class="active">Configuration</a>
+          <a href="examples.html">Examples</a>
+          <a href="faq.html">FAQ</a>
+          <a class="github-link" href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <button class="nav-toggle" type="button" aria-label="Open menu">Menu</button>
+    </div>
+  </header>
+  <div class="mobile-nav" id="mobile-nav">
+      <a href="index.html">Overview</a>
+      <a href="install.html">Install</a>
+      <a href="quickstart.html">Quick start</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="modules.html">Modules</a>
+      <a href="reconstruction.html">Reconstruction</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="api.html">API</a>
+      <a href="configuration.html">Configuration</a>
+      <a href="examples.html">Examples</a>
+      <a href="faq.html">FAQ</a>
+      <a href="https://github.com/parsashu/PATBox" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <main>
+
+    <p class="kicker">params.yaml</p>
+    <h1 class="page-title">Configuration</h1>
+    <p class="lead">Defaults live in <code>params.yaml</code> at the package root. Edit the file or override any field via name-value pairs.</p>
+
+    <h2>Reading defaults in MATLAB</h2>
+<pre><code>sim_cfg = simParameters();
+recon_cfg = reconParameters();
+algo = reconParameters('AlgorithmName');
+bench = benchmarkParameters();
+multi = multiReconParameters();</code></pre>
+
+    <div class="callout">
+      <p>After editing <code>params.yaml</code>, run <code>clear functions</code> so MATLAB reloads the YAML parser cache.</p>
+    </div>
+
+    <h2>reconstruction</h2>
+<pre><code>reconstruction:
+  AlgorithmName: DMAS
+  envelope_signal: false
+  remove_negatives: true
+  bandpass_filter: false
+  frequency_low: 0.1e6
+  frequency_high: 10.0e6
+  SaveOutput: false
+  SaveMat: true
+  SavePng: true
+  OutputDir: output/recon
+  OutputSuffix: ""
+  iterative:
+    interp_method: linear
+    InitialGuess: DMAS
+    NumIterations: 5
+    StepSize: 0.25
+    UpdateMethod: TR</code></pre>
+
+    <h2>simulation — I/O and source</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Default</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>UseSimulation</code></td><td><code>true</code></td><td>Run k-Wave; <code>false</code> loads <code>SensorDataPath</code></td></tr>
+          <tr><td><code>ImagePath</code></td><td><code>data/Example1.bmp</code></td><td>Default phantom image</td></tr>
+          <tr><td><code>SourceModel</code></td><td><code>normalized_image</code></td><td><code>normalized_image</code> | <code>initial_pressure_mat</code> | <code>absorption_fluence</code></td></tr>
+          <tr><td><code>P0Scale</code></td><td><code>2</code></td><td>Scale for normalized images</td></tr>
+          <tr><td><code>Gruneisen</code></td><td><code>0.12</code></td><td>Used with absorption×fluence sources</td></tr>
+          <tr><td><code>RandomSeed</code></td><td><code>1</code></td><td>Reproducible media / noise draws</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>simulation — grid and solver</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Default</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>GridSize</code> / <code>GridSizeX/Y</code></td><td>512 / 512×520</td><td>Computational grid size</td></tr>
+          <tr><td><code>Dx</code> / <code>Dy</code></td><td><code>0</code></td><td>Explicit spacing; <code>0</code> derives from PPW</td></tr>
+          <tr><td><code>PointsPerWavelength</code></td><td><code>4</code></td><td>Spatial sampling vs <code>MaxFrequency</code></td></tr>
+          <tr><td><code>CFL</code></td><td><code>0.2</code></td><td>Time-step stability number</td></tr>
+          <tr><td><code>PMLSize</code></td><td><code>20</code></td><td>Absorbing boundary thickness</td></tr>
+          <tr><td><code>DataCast</code></td><td><code>gpuArray-single</code></td><td>Falls back to CPU <code>single</code> if needed</td></tr>
+          <tr><td><code>MaxFrequency</code></td><td><code>5e6</code></td><td>Design frequency for grid spacing</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>simulation — medium</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Default</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>MediumModel</code></td><td><code>homogeneous</code></td><td><code>homogeneous</code> | <code>gaussian</code> | <code>mat</code> | <code>segmented</code></td></tr>
+          <tr><td><code>SoundSpeed</code> / <code>Density</code></td><td>1500 / 1000</td><td>Baseline acoustic properties</td></tr>
+          <tr><td><code>SoundSpeedStd</code> / <code>DensityStd</code></td><td>20 / 15</td><td>Gaussian heterogeneity std</td></tr>
+          <tr><td><code>CorrelationLength</code></td><td><code>1e-3</code></td><td>Heterogeneity correlation length (m)</td></tr>
+          <tr><td><code>AlphaCoeff</code> / <code>AlphaPower</code></td><td>0 / 1.5</td><td>Absorption (k-Wave units)</td></tr>
+          <tr><td><code>AlphaMode</code></td><td><code>full</code></td><td><code>full</code> | <code>no_dispersion</code> | <code>no_absorption</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>simulation — array</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Default</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>SensorType</code></td><td><code>linear</code></td><td><code>linear</code> | <code>square</code> | <code>circular</code> | <code>arc</code></td></tr>
+          <tr><td><code>SensorModel</code></td><td><code>auto</code></td><td><code>auto</code> | <code>kwave_array</code> | <code>rasterized</code> | <code>point</code> | <code>cartesian_point</code></td></tr>
+          <tr><td><code>NumTransducers</code></td><td><code>128</code></td><td>Total physical elements</td></tr>
+          <tr><td><code>Pitch</code> / <code>Kerf</code> / <code>ElementWidth</code></td><td>0.3 / 0.03 / 0.27 mm</td><td>Linear-array geometry</td></tr>
+          <tr><td><code>SensorArcDeg</code></td><td><code>180</code></td><td>Arc span (degrees)</td></tr>
+          <tr><td><code>ReconstructionGeometryMode</code></td><td><code>calibrated</code></td><td><code>calibrated</code> or <code>nominal</code> for recon</td></tr>
+          <tr><td><code>CenterFrequency</code></td><td><code>5e6</code></td><td>Element centre frequency</td></tr>
+          <tr><td><code>FractionalBandwidthPercent</code></td><td><code>80</code></td><td>Bandwidth for impulse response</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>simulation — acquisition / noise</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Default</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>NoiseModel</code></td><td><code>awgn</code></td><td><code>none</code> | <code>awgn</code> | <code>colored</code> | <code>measured</code> | <code>hybrid</code></td></tr>
+          <tr><td><code>TargetSNRdB</code></td><td><code>20</code></td><td>Preferred noise control</td></tr>
+          <tr><td><code>NoiseLevel</code></td><td><code>0.1</code></td><td>Deprecated; prefer <code>TargetSNRdB</code></td></tr>
+          <tr><td><code>NoiseScaling</code></td><td><code>global</code></td><td><code>global</code> or <code>per_channel</code></td></tr>
+          <tr><td><code>ChannelGainStd</code></td><td><code>0</code></td><td>Lognormal element sensitivity</td></tr>
+          <tr><td><code>TimeJitterStd</code> / <code>TriggerJitterStd</code></td><td>0</td><td>Per-channel / common timing skew</td></tr>
+          <tr><td><code>CrosstalkFraction</code></td><td><code>0</code></td><td>Nearest-neighbour crosstalk</td></tr>
+          <tr><td><code>DeadChannelFraction</code></td><td><code>0</code></td><td>Fraction of dead channels</td></tr>
+          <tr><td><code>ADCBitDepth</code></td><td><code>0</code></td><td><code>0</code> disables quantisation</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>examples sections</h2>
+    <p><code>benchmark_algorithms</code> and <code>multi_reconstruction</code> configure algorithm lists, metrics, envelopes, and output paths for scripts under <code>examples/</code>.</p>
+
+  </main>
+  <footer class="site-footer">
+    <div class="inner">
+      <div>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></div>
+      <div><a href="https://github.com/parsashu/PATBox">github.com/parsashu/PATBox</a></div>
+    </div>
+  </footer>
+  <script src="assets/site.js"></script>
+</body>
+</html>
