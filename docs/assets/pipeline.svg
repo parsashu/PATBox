@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" role="img" aria-label="PATBox pipeline">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="720" y2="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#eff6ff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="180" y1="110" x2="520" y2="110" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#93c5fd" stop-opacity="0"/>
+      <stop offset=".35" stop-color="#3b82f6"/>
+      <stop offset=".7" stop-color="#1d4ed8"/>
+      <stop offset="1" stop-color="#1d4ed8" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="220" rx="24" fill="url(#bg)"/>
+  <!-- phantom -->
+  <circle cx="140" cy="110" r="48" fill="#bfdbfe" opacity=".55"/>
+  <circle cx="126" cy="98" r="10" fill="#1d4ed8"/>
+  <circle cx="156" cy="120" r="7" fill="#2563eb"/>
+  <circle cx="138" cy="128" r="5" fill="#38bdf8"/>
+  <!-- wave rings -->
+  <circle cx="250" cy="110" r="28" fill="none" stroke="#60a5fa" stroke-width="2" opacity=".9"/>
+  <circle cx="250" cy="110" r="44" fill="none" stroke="#3b82f6" stroke-width="2" opacity=".55"/>
+  <circle cx="250" cy="110" r="60" fill="none" stroke="#1d4ed8" stroke-width="1.5" opacity=".35"/>
+  <path d="M320 110 H470" stroke="url(#wave)" stroke-width="4" stroke-linecap="round"/>
+  <!-- array -->
+  <g fill="#1e3a8a">
+    <rect x="500" y="42" width="10" height="22" rx="3"/>
+    <rect x="520" y="52" width="10" height="22" rx="3"/>
+    <rect x="540" y="62" width="10" height="22" rx="3"/>
+    <rect x="560" y="72" width="10" height="22" rx="3"/>
+    <rect x="580" y="82" width="10" height="22" rx="3"/>
+    <rect x="600" y="92" width="10" height="22" rx="3"/>
+    <rect x="580" y="116" width="10" height="22" rx="3"/>
+    <rect x="560" y="126" width="10" height="22" rx="3"/>
+    <rect x="540" y="136" width="10" height="22" rx="3"/>
+    <rect x="520" y="146" width="10" height="22" rx="3"/>
+    <rect x="500" y="156" width="10" height="22" rx="3"/>
+  </g>
+  <!-- rf bars -->
+  <g fill="#38bdf8">
+    <rect x="630" y="70" width="6" height="40" rx="2"/>
+    <rect x="642" y="55" width="6" height="55" rx="2"/>
+    <rect x="654" y="80" width="6" height="30" rx="2"/>
+    <rect x="666" y="48" width="6" height="62" rx="2"/>
+    <rect x="678" y="90" width="6" height="20" rx="2"/>
+  </g>
+  <text x="120" y="198" text-anchor="middle" font-family="Plus Jakarta Sans,Segoe UI,sans-serif" font-size="13" fill="#1e3a8a" font-weight="600">p€ source</text>
+  <text x="250" y="198" text-anchor="middle" font-family="Plus Jakarta Sans,Segoe UI,sans-serif" font-size="13" fill="#1e3a8a" font-weight="600">propagate</text>
+  <text x="550" y="198" text-anchor="middle" font-family="Plus Jakarta Sans,Segoe UI,sans-serif" font-size="13" fill="#1e3a8a" font-weight="600">sense</text>
+  <text x="660" y="198" text-anchor="middle" font-family="Plus Jakarta Sans,Segoe UI,sans-serif" font-size="13" fill="#1e3a8a" font-weight="600">RF</text>
+</svg>

@@ -1,11 +1,11 @@
 # PATBox
 
+**[Documentation](https://parsashu.github.io/PATBox/)** — install, quick start, modules, API, and configuration
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-0f6e6a)](https://parsashu.github.io/PATBox/)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-1d4ed8)](https://parsashu.github.io/PATBox/)
 
 PATBox wraps k-Wave forward simulation and a collection of delay-and-sum style reconstruction algorithms (DAS, DMAS, UBP, VDAS, iterative methods, and others) behind a small unified API.
-
-**Documentation:** [parsashu.github.io/PATBox](https://parsashu.github.io/PATBox/) — install guide, quick start, module reference, API, and configuration.
 
 It is especially useful for quickly comparing reconstruction algorithms and seeing how changes to simulation settings (sensor geometry, noise, grid) and reconstruction options (algorithm, envelopes, iterations) affect image quality — most defaults live in `params.yaml`, so you can swap settings and re-run without editing code.
 

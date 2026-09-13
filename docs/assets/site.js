@@ -6,4 +6,26 @@ document.addEventListener("DOMContentLoaded", () => {
       mobile.classList.toggle("open");
     });
   }
+
+  const targets = document.querySelectorAll(
+    ".panel, .callout, .table-wrap, .pipeline-figure, .hero-visual, pre"
+  );
+  targets.forEach((el) => el.classList.add("reveal"));
+
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    targets.forEach((el) => io.observe(el));
+  } else {
+    targets.forEach((el) => el.classList.add("in"));
+  }
 });
