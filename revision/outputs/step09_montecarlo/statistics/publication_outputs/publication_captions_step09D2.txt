@@ -1,0 +1,11 @@
+MAIN FIGURE -- Ranking stability
+
+Ranking stability of the expanded paired Monte Carlo analysis. (A) Mean Spearman correlation between interim six-method rankings and the final N=50 rankings as the number of paired realizations increased from 10 to 50; the shaded region spans the minimum to maximum correlation across the 25 SNR--metric families. (B) Fraction of families for which the highest-ranked method matched the final N=50 result. (C) Mean and worst absolute displacement of method mean ranks relative to N=50. By N=40, the highest-ranked method agreed with the final analysis in all 25 families.
+
+SUPPLEMENTARY FIGURE -- Kendall W and winners
+
+Method-ranking concordance in the N=50 paired Monte Carlo study. Each cell reports Kendall's coefficient of concordance W and the highest-ranked reconstruction method for one SNR--metric family. All 25 Friedman tests remained significant after Holm correction across the omnibus family.
+
+SUPPLEMENTARY FIGURE -- Selected effect sizes
+
+Matched-pairs rank-biserial effect sizes for three prespecified method contrasts across five input SNR levels and five evaluation metrics. Positive values favor the first named method and negative values favor the second after orienting each metric so that positive performance differences represent improvement. Asterisks denote pairwise comparisons significant under the primary within-family Holm correction following a significant omnibus Friedman test.
