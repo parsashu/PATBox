@@ -9,11 +9,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/style.css" />
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
 </head>
 <body>
   <header class="site-header">
     <div class="nav-inner">
-      <a class="brand" href="index.html">PATBox <span>v0.6.7-physics-core</span></a>
+      <a class="brand" href="index.html">
+        <img class="brand-mark" src="assets/logo.svg" alt="" width="34" height="34" />
+        PATBox <span>v0.6.7-physics-core</span>
+      </a>
       <nav class="nav-links">
           <a href="index.html" class="active">Overview</a>
           <a href="install.html">Install</a>
@@ -48,32 +52,51 @@
   <main>
 
     <section class="hero">
-      <div class="kicker">MATLAB photoacoustic toolbox</div>
-      <h1>Simulate. Reconstruct. Compare.</h1>
-      <p>
-        PATBox is a thin, physics-aware API over k-Wave forward simulation and a suite of
-        delay-and-sum family reconstruction methods. Tune sensors, media, noise, and algorithms
-        from <code>params.yaml</code> — then evaluate image quality in one call.
-      </p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="install.html">Install</a>
-        <a class="btn btn-ghost" href="quickstart.html">Quick start</a>
-        <a class="btn btn-ghost" href="api.html">API reference</a>
+      <div class="hero-layout">
+        <div>
+          <div class="kicker">MATLAB photoacoustic toolbox</div>
+          <h1>Simulate. Reconstruct. Compare.</h1>
+          <p>
+            PATBox is a thin, physics-aware API over k-Wave forward simulation and a suite of
+            delay-and-sum family reconstruction methods. Tune sensors, media, noise, and algorithms
+            from <code>params.yaml</code> — then evaluate image quality in one call.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="install.html">Install</a>
+            <a class="btn btn-ghost" href="quickstart.html">Quick start</a>
+            <a class="btn btn-ghost" href="api.html">API reference</a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <img src="assets/patbox-hero.png" alt="Photoacoustic waves propagating toward a sensor array" width="960" height="600" />
+          <div class="hero-badge">
+            <img src="assets/logo.svg" alt="" width="18" height="18" />
+            Physics-aware PAT pipeline
+          </div>
+        </div>
       </div>
     </section>
 
+    <figure class="pipeline-figure">
+      <img src="assets/pipeline.svg" alt="PATBox pipeline from initial pressure to RF sensor data" width="720" height="220" />
+    </figure>
+    <p class="figure-caption">From initial pressure → wave propagation → array sensing → RF channels.</p>
+
     <section class="grid grid-3">
       <article class="panel">
+        <img class="panel-icon" src="assets/patbox-mark.png" alt="" width="42" height="42" />
         <h3>Physics-aware simulation</h3>
         <p class="muted">Linear, square, circular, and arc arrays with finite-element sensors, heterogeneous media, attenuation, and calibrated acquisition noise.</p>
         <p><a href="simulation.html">Simulation modules →</a></p>
       </article>
       <article class="panel">
+        <img class="panel-icon" src="assets/logo.svg" alt="" width="42" height="42" />
         <h3>15 reconstruction algorithms</h3>
         <p class="muted">DAS, DMAS, coherence and MV variants, FBP/UBP hybrids, time reversal, and iterative solvers behind one dispatcher.</p>
         <p><a href="reconstruction.html">Algorithms →</a></p>
       </article>
       <article class="panel">
+        <img class="panel-icon" src="assets/patbox-mark.png" alt="" width="42" height="42" />
         <h3>YAML-first workflow</h3>
         <p class="muted">Defaults live in <code>params.yaml</code>. Override any field at runtime with name-value pairs.</p>
         <p><a href="configuration.html">Configuration →</a></p>
@@ -126,7 +149,10 @@ fprintf('%s | PSNR %.2f dB | SSIM %.3f\n', ...
   </main>
   <footer class="site-footer">
     <div class="inner">
-      <div>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></div>
+      <div class="footer-brand">
+        <img src="assets/logo.svg" alt="" width="24" height="24" />
+        <span>PATBox · MIT License · Built on <a href="http://www.k-wave.org/" target="_blank" rel="noopener">k-Wave</a></span>
+      </div>
       <div><a href="https://github.com/parsashu/PATBox">github.com/parsashu/PATBox</a></div>
     </div>
   </footer>
